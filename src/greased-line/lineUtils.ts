@@ -1,0 +1,156 @@
+import { Vector3 } from '@babylonjs/core'
+
+interface SubLine {
+  point1: Vector3
+  point2: Vector3
+  length: number
+}
+
+interface SubLinesMinMax {
+  min: number
+  max: number
+}
+
+export function getLineLength(points: Vector3[]): number {
+  let length = 0
+  for (let index = 0; index < points.length - 1; index++) {
+    const point1 = points[index]
+    const point2 = points[index + 1]
+    length += point2.subtract(point1).length()
+  }
+  return length
+}
+
+export function divideLine(point1: Vector3, point2: Vector3, segmentCount: number): Vector3[] {
+  const dividedLinePoints: Vector3[] = []
+  const diff = point2.subtract(point1)
+  const segmentVector = diff.divide(new Vector3(segmentCount, segmentCount, segmentCount))
+
+  let nextPoint = point1.clone()
+  dividedLinePoints.push(nextPoint)
+  for (let index = 0; index < segmentCount; index++) {
+    nextPoint = nextPoint.clone()
+    dividedLinePoints.push(nextPoint.addInPlace(segmentVector))
+  }
+
+  return dividedLinePoints
+}
+
+export function getSubLines(points: Vector3[]): SubLine[] {
+  const subLines: SubLine[] = []
+  for (let index = 0; index < points.length - 1; index++) {
+    const point1 = points[index]
+    const point2 = points[index + 1]
+    const length = point2.subtract(point1).length()
+    subLines.push({ point1, point2, length })
+  }
+
+  return subLines
+}
+
+export function getMinMaxSubLineLength(points: Vector3[]): SubLinesMinMax {
+  const subLines = getSubLines(points)
+  const sorted = subLines.sort((s) => s.length)
+  return {
+    min: sorted[0].length,
+    max: sorted[sorted.length - 1].length,
+  }
+}
+
+export function segmentize(what: Vector3[] | SubLine[], segmentLength: number): Vector3[] {
+  const subLines = what[0] instanceof Vector3 ? getSubLines(what as Vector3[]) : (what as SubLine[])
+  const points: Vector3[] = []
+  subLines.forEach((s) => {
+    if (s.length > segmentLength) {
+      const segments = divideLine(s.point1, s.point2, Math.ceil(s.length / segmentLength))
+      segments.forEach((seg) => {
+        points.push(seg)
+      })
+    } else {
+      points.push(s.point1)
+      points.push(s.point2)
+    }
+  })
+  return points
+}
+
+export function circle(radius: number, segments: number, segmentAngle?: number, z = 0) {
+  const points: number[] = []
+  const add = segmentAngle ?? (Math.PI * 2) / segments
+  for (let i = 0; i <= segments; i++) {
+    points.push(
+      Math.cos(i * add) * radius,
+      Math.sin(i * add) * radius,
+      z,
+    )
+  }
+  return points
+}
+
+export function bezier(p0: Vector3, p1: Vector3, p2: Vector3, segments: number) {
+  const points: number[] = []
+
+  for (let i = 0; i < segments; i++) {
+    const point = getBezierPoint(i / segments, p0, p1, p2)
+    points.push(point.x, point.y, point.z)
+  }
+
+  return points
+}
+
+function getBezierPoint(percent: number, p0: Vector3, p1: Vector3, p2: Vector3) {
+  const a0 = (1 - percent) ** 2,
+    a1 = 2 * percent * (1 - percent),
+    a2 = percent ** 2
+  return {
+    x: a0 * p0.x + a1 * p1.x + a2 * p2.x,
+    y: a0 * p0.y + a1 * p1.y + a2 * p2.y,
+    z: a0 * p0.z + a1 * p1.z + a2 * p2.z,
+  }
+}
+
+export function getArrowCap(position: Vector3, direction: Vector3, length: number, widthUp: number, widthDown: number, widthStartUp = 0, widthStartDown = 0) {
+  const points = [
+    position.clone(),
+    position.add(direction.multiplyByFloats(length, length, length))
+  ]
+  const widths = [
+    widthStartUp, widthStartDown, widthUp, widthDown
+  ]
+
+  return {
+    points,
+    widths
+  }
+}
+
+export function getCircleCap(position: Vector3, direction: Vector3, radiusA: number, radiusB: number, segments: number) {
+  // const points = [
+  //   position.clone(),
+  //   position.add(direction.multiplyByFloats(length, length, length))
+  // ]
+  // const widths = [
+  //   widthStartUp, widthStartDown, widthUp, widthDown
+  // ]
+
+  const points:Vector3[] = []
+  const widths:number[] = []
+
+  const segmentLength = radiusA * 4 / segments
+  for (let i=0,j=0;i<segments+1;i++,j+=Math.PI/segments/2) {
+    const s = segmentLength * Math.cos(j)
+    console.log(s)
+    const p = position.add(direction.multiplyByFloats(s, s, s))
+    points.push(p.clone())
+    const w = Math.ceil(radiusB * Math.sin(j)) + radiusB
+    widths.push(w,w)
+  }
+
+  console.log(widths)
+
+  return {
+    points,
+    widths
+  }
+}
+
