@@ -52,7 +52,7 @@ export const basicLinks: LinkProps[] = [
   },
   {
     title: 'Lazy',
-    caption: 'Lazy initialization',
+    caption: 'Lazy initialization (takes a moment to render )',
     link: 'Lazy',
   },
   {
@@ -83,7 +83,7 @@ export const basicLinks: LinkProps[] = [
   {
     title: 'Caps',
     caption: 'Create capped lines, arrows, ...',
-    link: 'Glow',
+    link: 'Caps',
   },
   {
     title: 'Blend mode',
@@ -123,16 +123,51 @@ export const toolsLinks: LinkProps[] = [
   {
     title: 'Intro to Tools',
     caption: 'Basic information you need to know',
-    link: 'ToolsInfo',
+    link: 'tools/Try',
   },
 ];
 
 //
 
 export const demoLinks: LinkProps[] = [
+  // {
+  //   title: 'Intro to Demos',
+  //   caption: 'Basic information you need to know',
+  //   link: 'demos/Info',
+  // },
   {
-    title: 'Demo to Tools',
-    caption: 'Basic information you need to know',
-    link: 'ToolsInfo',
+    title: 'Wave Analyzer',
+    caption: 'Using line widths to create a wave analyzer',
+    link: 'demos/WaveAnalyzer',
+  },
+  {
+    title: 'Geometry Draw - Blender Monkey',
+    caption: 'Draw wireframe of a mesh',
+    link: 'demos/GeometryDrawBlenderMonkey',
+  },
+  {
+    title: 'Curve Draw - Blender',
+    caption: 'Draw curves from Blender',
+    link: 'demos/CurveDraw',
+  },
+  {
+    title: 'Star Wars light speed',
+    caption: 'Light speed effect seen on Star Wars (kinda :D)',
+    link: 'demos/StarWars',
+  },
+  {
+    title: 'GitHub style Lines flying around Earth',
+    caption: 'Lines flying from point to point around the globe',
+    link: 'demos/FlyingLines',
+  },
+  {
+    title: 'Beauty Charts - coming soon',
+    caption: 'Animated cool charts',
+    link: 'demos/BeautyCharts',
+  },
+  {
+    title: 'Disco Lasers - coming soon',
+    caption: 'D I S C O',
+    link: 'demos/DiscoLasers',
   },
 ];

@@ -14,8 +14,7 @@ import { PBRCustomMaterial } from '@babylonjs/materials';
 import { ColorDistribution, ColorSamplingMode } from './GraesedLineBuilder';
 
 export interface GreasedLinePBRMaterialParameters {
-  // color?: Color3
-  // opacity?: number
+  lazy?: boolean;
   width?: number;
 
   useColors?: boolean;
@@ -26,23 +25,11 @@ export interface GreasedLinePBRMaterialParameters {
   sizeAttenuation?: boolean;
   visibility?: number;
 
-  // useMap?: boolean
-  // map?: Texture
-
-  // alphaMap?: Texture
-  // useAlphaMap?: boolean
-
   resolution?: Vector2;
   dashArray?: number;
   dashOffset?: number;
   dashRatio?: number;
   useDash?: boolean;
-  // alphaTest?: number
-  // repeat?: Vector2
-
-  // uvOffset?: Vector2
-  // uvRotation?: number
-  // uvScale?: Vector2
 }
 
 export class GreasedLinePBRMaterial extends PBRCustomMaterial {
@@ -53,6 +40,24 @@ export class GreasedLinePBRMaterial extends PBRCustomMaterial {
   private _widthsTexture?: Texture;
 
   private _updateUniforms = false;
+
+  private static EmptyTexture?: RawTexture;
+
+  private static _GetEmptyTexture(scene: Scene) {
+    if (!GreasedLinePBRMaterial.EmptyTexture) {
+      GreasedLinePBRMaterial.EmptyTexture = new RawTexture(
+        new Uint8Array([0]),
+        1,
+        1,
+        Engine.TEXTUREFORMAT_RGB,
+        scene,
+        false,
+        true,
+        RawTexture.NEAREST_NEAREST
+      );
+    }
+    return GreasedLinePBRMaterial.EmptyTexture;
+  }
 
   constructor(
     name: string,
@@ -134,7 +139,11 @@ export class GreasedLinePBRMaterial extends PBRCustomMaterial {
       }
     } else {
       this.AddUniform('colorsCount', 'float', 1);
-      this.AddUniform('colors', 'sampler2D', null);
+      this.AddUniform(
+        'colors',
+        'sampler2D',
+        GreasedLinePBRMaterial._GetEmptyTexture(this.getScene())
+      );
       // this.setUseColors(false);
       useColors = false;
     }
@@ -151,7 +160,6 @@ export class GreasedLinePBRMaterial extends PBRCustomMaterial {
     const activeCamera = this.getScene().activeCamera;
     if (activeCamera) {
       const projection = activeCamera.getProjectionMatrix();
-      // greasedLineProjection - workaround https://forum.babylonjs.com/t/github-globe-like-scene-with-flying-lines/36503/2
       this.AddUniform('greasedLineProjection', 'mat4', projection);
     }
 

@@ -4,7 +4,7 @@
 </template>
 
 <script setup lang="ts">
-import { ArcRotateCamera, Color3, Color4, Scalar, Scene, Vector3 } from '@babylonjs/core';
+import { ArcRotateCamera, Color3, Scalar, Scene, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
 import { GreasedLineBuilder } from '../greased-line/GraesedLineBuilder';
@@ -13,7 +13,7 @@ import { GreasedLine } from 'src/greased-line/GreasedLine';
 
 const codeSnippets = [
   `  let instance: GreasedLine | undefined = undefined;
-  for (let i = 0; i < 4000; i++) {
+  for (let i = 0; i < 4096; i++) { // 4096 is the maximum number of lines
     const points = [];
     const widths = [];
     const colors = [Color3.Random()]
@@ -58,7 +58,7 @@ onMounted(() => {
 
 const demo = (scene: Scene, camera: ArcRotateCamera) => {
   let instance: GreasedLine | undefined = undefined;
-  for (let i = 0; i < 4000; i++) {
+  for (let i = 0; i < 4096; i++) {
     const points = [];
     const widths = [];
     const colors = [Color3.Random()]
@@ -89,7 +89,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
   }
 
   if (instance) {
-    instance.updateLazyLine()
+    instance.updateLazy()
     camera.zoomOnFactor = 0.8;
     camera.zoomOn([instance]);
   }

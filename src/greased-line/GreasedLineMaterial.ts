@@ -244,6 +244,16 @@ export class GreasedLineMaterial extends ShaderMaterial {
     this.setTexture('alphaMap', alphaMap);
   }
 
+  public updateLazy() {
+    if (this._parameters.colors) {
+      //   this._setColorsTexture(
+      //     0,
+      //     this._parameters.colors,
+      //     this._parameters.colorsSamplingMode
+      //   );
+    }
+  }
+
   public setColors(
     colors: Nullable<Uint8Array>,
     colorsSamplingMode?: ColorSamplingMode

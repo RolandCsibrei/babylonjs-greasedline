@@ -46,12 +46,7 @@ const codeSnippets = [
   // line5
   {
     widthDistribution: WidthDistribution.Repeat
-  }
-
-  // line6
-  {
-    widthDistribution: WidthDistribution.None
-  }  `,
+  }`,
 ]
 
 const canvas = ref<HTMLCanvasElement | null>(null);
@@ -85,7 +80,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
   const line2 = GreasedLineBuilder.CreateGreasedLine(
     'basic-line-2',
     {
-      points: points1.map(p => new Vector3(p.x, p.y + 2, p.z)),
+      points: points1.map(p => new Vector3(p.x, p.y - 2, p.z)),
       widths,
       width: 40,
       widthsDistribution: WidthsDistribution.End
@@ -97,7 +92,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
   const line3 = GreasedLineBuilder.CreateGreasedLine(
     'basic-line-3',
     {
-      points: points1.map(p => new Vector3(p.x, p.y + 4, p.z)),
+      points: points1.map(p => new Vector3(p.x, p.y - 4, p.z)),
       widths,
       width: 40,
       widthsDistribution: WidthsDistribution.Even
@@ -108,7 +103,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
   const line4 = GreasedLineBuilder.CreateGreasedLine(
     'basic-line-4',
     {
-      points: points1.map(p => new Vector3(p.x, p.y + 6, p.z)),
+      points: points1.map(p => new Vector3(p.x, p.y - 6, p.z)),
       widths,
       width: 40,
       widthsDistribution: WidthsDistribution.StartEnd
@@ -119,7 +114,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
   const line5 = GreasedLineBuilder.CreateGreasedLine(
     'basic-line-5',
     {
-      points: points1.map(p => new Vector3(p.x, p.y + 8, p.z)),
+      points: points1.map(p => new Vector3(p.x, p.y - 8, p.z)),
       widths,
       width: 40,
       widthsDistribution: WidthsDistribution.Repeat
@@ -127,22 +122,12 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     scene
   )
   //
-  const line6 = GreasedLineBuilder.CreateGreasedLine(
-    'basic-line-6',
-    {
-      points: points1.map(p => new Vector3(p.x, p.y + 10, p.z)),
-      widths,
-      width: 40,
-      widthsDistribution: WidthsDistribution.None
-    },
-    scene
-  )
-  //
+
 
 
 
   camera.zoomOnFactor = 1.3
-  camera.zoomOn([line1, line2, line3, line4, line5, line6])
+  camera.zoomOn([line1, line2, line3, line4, line5,])
 
   camera.position.x -= 5
   camera.target.x -= 5

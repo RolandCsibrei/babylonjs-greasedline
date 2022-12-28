@@ -5,13 +5,18 @@
     </q-page-sticky>
     <q-drawer v-model="leftDrawerOpen" overlay :width="400">
       <q-tabs v-model="tab" inline-label>
+        <q-tab name="demos" icon="star" label="Demos" />
         <q-tab name="basics" label="Basics" />
         <q-tab name="pbr" label="PBR" />
         <q-tab name="tools" label="Tools" />
-        <q-tab name="demos" icon="star" label="Demos" />
       </q-tabs>
       <q-scroll-area style="height:100%" class="q-pb-xl">
         <q-tab-panels v-model="tab" animated>
+          <q-tab-panel name="demos">
+            <q-list class="q-mt-md">
+              <EssentialLink v-for="link in demoLinks" :key="link.title" v-bind="link" />
+            </q-list>
+          </q-tab-panel>
           <q-tab-panel name="basics">
             <q-list class="q-mt-md">
               <EssentialLink v-for="link in basicLinks" :key="link.title" v-bind="link" />
@@ -27,11 +32,7 @@
               <EssentialLink v-for="link in toolsLinks" :key="link.title" v-bind="link" />
             </q-list>
           </q-tab-panel>
-          <q-tab-panel name="demos">
-            <q-list class="q-mt-md">
-              <EssentialLink v-for="link in demoLinks" :key="link.title" v-bind="link" />
-            </q-list>
-          </q-tab-panel>
+
         </q-tab-panels>
       </q-scroll-area>
     </q-drawer>

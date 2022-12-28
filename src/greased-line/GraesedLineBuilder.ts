@@ -43,13 +43,6 @@ export enum ColorSamplingMode {
   Smooth,
 }
 
-export interface AddGreasedLineParameters {
-  sizeStart: number;
-  sizeEnd?: number;
-  colorStart: Color3;
-  colorEnd?: Color3;
-}
-
 export interface GreasedLineBuilderParameters {
   lazy?: boolean;
 
@@ -104,7 +97,7 @@ export class GreasedLineBuilder {
 
     let instance;
 
-    const allPoints = GreasedLineBuilder._Convert(parameters.points);
+    const allPoints = GreasedLineBuilder.ConvertPoints(parameters.points);
     let length = 0;
     if (Array.isArray(allPoints[0])) {
       allPoints.forEach((points) => {
@@ -227,7 +220,7 @@ export class GreasedLineBuilder {
     return colorTable;
   }
 
-  private static _Convert(points: GreasedLinePoints): number[][] {
+  public static ConvertPoints(points: GreasedLinePoints): number[][] {
     if (
       points.length &&
       !Array.isArray(points[0]) &&
@@ -318,9 +311,9 @@ export class GreasedLineBuilder {
         const halfCount = Math.floor(widths.length / 2);
 
         // start sector
-        for (let i = 0; i < halfCount; i += 2) {
-          widthsData.push(widths[i]);
-          widthsData.push(widths[i + 1]);
+        for (let i = 0, j = 0; i < halfCount - 1; i++) {
+          widthsData.push(widths[j++]);
+          widthsData.push(widths[j++]);
         }
 
         // middle sector
@@ -373,20 +366,20 @@ export class GreasedLineBuilder {
         }
       } else if (widthsDistribution === WidthsDistribution.Even) {
         let j = 0;
-        const widthsectorLength = widths.length / (pointCount - 1);
-        for (let x = 0; x < pointCount - 1; x++) {
+        const widthsectorLength = widths.length / ((pointCount - 1) * 2);
+        for (let x = 0; x < pointCount; x++) {
           const i = Math.floor(j);
 
           widthsData.push(widths[i]);
-          widthsData.push(widths[i]);
+          widthsData.push(widths[i + 1]);
 
           j += widthsectorLength;
         }
-      } else if (widthsDistribution === WidthsDistribution.None) {
-        for (let i = 0; i < widths.length; i++) {
-          widthsData.push(widths[i]);
-          widthsData.push(widths[i]);
-        }
+        // } else if (widthsDistribution === WidthsDistribution.None) {
+        //   for (let i = 0; i < widths.length; i++) {
+        //     widthsData.push(widths[i]);
+        //     widthsData.push(widths[i]);
+        //   }
       }
     } else {
       for (let i = 0; i < widths.length; i++) {
@@ -422,7 +415,7 @@ export class GreasedLineBuilder {
         }
 
         // middle sector
-        for (let i = 0; i < missingCount; i++) {
+        for (let i = 0; i < missingCount - 1; i++) {
           colorsData.push(defaultColor);
           colorsData.push(defaultColor);
         }
@@ -446,7 +439,7 @@ export class GreasedLineBuilder {
         }
       } else if (colorDistribution === ColorDistribution.End) {
         // start sector
-        for (let i = 0; i < missingCount; i++) {
+        for (let i = 0; i < missingCount - 1; i++) {
           colorsData.push(defaultColor);
           colorsData.push(defaultColor);
         }

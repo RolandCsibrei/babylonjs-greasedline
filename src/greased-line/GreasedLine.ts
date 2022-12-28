@@ -37,7 +37,7 @@ export enum WidthsDistribution {
   Start,
   End,
   StartEnd,
-  None,
+  // None,
 }
 
 export class GreasedLine extends Mesh {
@@ -101,10 +101,14 @@ export class GreasedLine extends Mesh {
     }
   }
 
-  public updateLazyLine() {
+  public updateLazy() {
     this.setPoints(this._points);
     this._drawLine();
     this._updateRaycastBoundingInfo();
+
+    if (this.material instanceof GreasedLineMaterial) {
+      this.material.updateLazy();
+    }
   }
 
   public getSegmentWidths() {

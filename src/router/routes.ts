@@ -182,17 +182,6 @@ const routes: RouteRecordRaw[] = [
     ],
   },
 
-  //
-  {
-    path: '/Info',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      {
-        path: '',
-        component: () => import('src/pages/BasicInfoPage.vue'),
-      },
-    ],
-  },
   {
     path: '/pbr/Info',
     component: () => import('layouts/MainLayout.vue'),
@@ -210,6 +199,102 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         component: () => import('src/pages/pbr/PBRBasicPage.vue'),
+      },
+    ],
+  },
+
+  //
+
+  {
+    path: '/demos/Info',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('src/pages/demos/InfoPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/demos/WaveAnalyzer',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('src/pages/demos/AnalyzerPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/demos/GeometryDrawBlenderMonkey',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('src/pages/demos/GMP.vue'),
+      },
+    ],
+  },
+  {
+    path: '/demos/CurveDraw',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('src/pages/demos/CurveDrawPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/demos/StarWars',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('src/pages/demos/StarWarsPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/demos/FlyingLines',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('src/pages/demos/FlyingLinesPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/demos/BeautyCharts',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('src/pages/demos/BeautyChartsPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/demos/DiscoLasers',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('src/pages/demos/DiscoLasersPage.vue'),
+      },
+    ],
+  },
+
+  //
+
+  {
+    path: '/tools/Try',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('src/pages/tools/TryPage.vue'),
       },
     ],
   },

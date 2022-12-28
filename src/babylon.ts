@@ -14,7 +14,11 @@ import {
 import { GridMaterial } from '@babylonjs/materials';
 import '@babylonjs/inspector';
 
-export const init = (canvas: HTMLCanvasElement, pbr = false) => {
+export const init = (
+  canvas: HTMLCanvasElement,
+  createGrid = true,
+  pbr = false
+) => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
@@ -24,7 +28,10 @@ export const init = (canvas: HTMLCanvasElement, pbr = false) => {
 
   // new AxesViewer(scene, 1);
 
-  const grid = createGridPlane(scene);
+  let grid;
+  if (createGrid) {
+    grid = createGridPlane(scene);
+  }
 
   if (pbr) {
     // createPBRSkybox(scene);
@@ -69,20 +76,19 @@ export const createScene = (engine: Engine) => {
   // scene.imageProcessingConfiguration.toneMappingType = ImageProcessingConfiguration.TONEMAPPING_ACES
 
   // show the inspector when pressing shift + alt + I
-  let axesViewer: AxesViewer;
+  // let axesViewer: AxesViewer;
   scene.onKeyboardObservable.add(({ event }) => {
     if (event.ctrlKey && event.shiftKey && event.code === 'KeyI') {
       if (scene.debugLayer.isVisible()) {
         scene.debugLayer.hide();
-        axesViewer?.dispose();
+        // axesViewer?.dispose();
       } else {
         scene.debugLayer.show({
           // embedMode: true,
         });
-        axesViewer = new AxesViewer(scene, 2);
+        // axesViewer = new AxesViewer(scene, 2);
 
         const snippets = document.getElementsByClassName('language-typescript');
-        debugger;
         for (let i = 0; i < snippets.length; i++) {
           const el = snippets.item(i) as any;
           if (el) {
