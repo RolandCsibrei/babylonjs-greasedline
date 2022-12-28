@@ -12,7 +12,7 @@ import CodeSnippets from 'src/components/CodeSnippets.vue';
 
 const codeSnippets = [
   `  const points1 = []
-  const colors1 = [Color3.Red(), Color3.Green(), Color3.Blue()]
+  const colors1 = [Color3.Red(), Color3.Green(), Color3.Blue(), Color3.Yellow()]
   for (let x = 0; x < 10; x += 0.25) {
     points1.push(new Vector3(x, Math.cos(x / 2), 0))
   }

@@ -1,11 +1,10 @@
 <template>
   <canvas ref="canvas" class="canvas"></canvas>
   <CodeSnippets :codeSnippets="codeSnippets" position="top-right" />
-  <CodeSnippets :codeSnippets="codeSnippetsRight" position="left" />
 </template>
 
 <script setup lang="ts">
-import { ArcRotateCamera, Color3, CubeTexture, Scalar, Scene, Vector3 } from '@babylonjs/core';
+import { ArcRotateCamera, Color3, Scene, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
 import { GreasedLineBuilder } from '../../greased-line/GraesedLineBuilder';
