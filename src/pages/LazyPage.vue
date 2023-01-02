@@ -44,7 +44,7 @@ const codeSnippets = [
   }
 
   if (instance) {
-    instance.updateLazyLine()
+    instance.updateLazy()
   }`,
 ];
 

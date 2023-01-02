@@ -197,7 +197,8 @@ export class GreasedLineBuilder {
         instance.material = new GreasedLineMaterial(
           name,
           scene,
-          initialMaterialParameters
+          initialMaterialParameters,
+          instance.isLazy()
         );
       }
     } else {
@@ -268,9 +269,9 @@ export class GreasedLineBuilder {
         );
         tmp.set(new Uint8Array(currentColors), 0);
         tmp.set(new Uint8Array(colorsUint8), currentColors.byteLength);
-        instance.material.setColors(tmp);
+        instance.material.setColors(tmp, instance.isLazy());
       } else {
-        instance.material.setColors(colorsUint8);
+        instance.material.setColors(colorsUint8, instance.isLazy());
       }
     }
   }

@@ -59,7 +59,8 @@ export class GreasedLineMaterial extends ShaderMaterial {
   constructor(
     name: string,
     scene: Scene,
-    parameters: GreasedLineMaterialParameters
+    parameters: GreasedLineMaterialParameters,
+    private _lazy = false
   ) {
     super(
       name,
@@ -124,7 +125,7 @@ export class GreasedLineMaterial extends ShaderMaterial {
     this.setColor(parameters.color ?? Color3.White());
     this.setOpacity(parameters.opacity ?? 1);
     this.setUseColors(parameters.useColors ?? false);
-    this.setColors(parameters.colors ?? null);
+    this.setColors(parameters.colors ?? null, this._lazy);
     this.setUseMap(parameters.useMap ?? false);
     this.setUseAlphaMap(parameters.useAlphaMap ?? false);
     parameters.map && this.setMap(parameters.map);
@@ -246,6 +247,7 @@ export class GreasedLineMaterial extends ShaderMaterial {
 
   public updateLazy() {
     if (this._parameters.colors) {
+      this.setColors(this._parameters.colors, false);
       //   this._setColorsTexture(
       //     0,
       //     this._parameters.colors,
@@ -256,7 +258,8 @@ export class GreasedLineMaterial extends ShaderMaterial {
 
   public setColors(
     colors: Nullable<Uint8Array>,
-    colorsSamplingMode?: ColorSamplingMode
+    // colorsSamplingMode?: ColorSamplingMode,
+    lazy = false
   ): void {
     if (colors === null || colors.length === 0) {
       this._colorsTexture?.dispose();
@@ -267,26 +270,34 @@ export class GreasedLineMaterial extends ShaderMaterial {
 
     this._parameters.colors = colors;
 
-    if (colorsSamplingMode) {
-      this._parameters.colorsSamplingMode = colorsSamplingMode;
+    debugger;
+
+    if (lazy) {
+      return;
     }
+
+    // if (colorsSamplingMode) {
+    //   this._parameters.colorsSamplingMode = colorsSamplingMode;
+    // }
 
     if (this._colorsTexture && origColorsCount === colors.length) {
       this._colorsTexture.update(colors);
     } else {
       this._colorsTexture?.dispose();
-
+      debugger;
+      const numOfColors = this._parameters.colors.length / 3;
+      const y = 1; // numOfColors / 4096;
       this._colorsTexture = new RawTexture(
         colors,
-        this._parameters.colors.length / 3,
-        1,
+        numOfColors, // Math.min(numOfColors, 4096),
+        y,
         Engine.TEXTUREFORMAT_RGB,
         this.getScene(),
         false,
         true,
-        colorsSamplingMode === ColorSamplingMode.Smooth
-          ? RawTexture.LINEAR_LINEAR
-          : RawTexture.NEAREST_NEAREST
+        // colorsSamplingMode === ColorSamplingMode.Smooth
+        // ? RawTexture.LINEAR_LINEAR
+        RawTexture.NEAREST_NEAREST
       );
       this._colorsTexture.name = 'greased-line-colors';
     }

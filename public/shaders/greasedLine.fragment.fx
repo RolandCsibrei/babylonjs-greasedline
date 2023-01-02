@@ -51,7 +51,11 @@ void main() {
         c.a *= ceil(mod(vCounters + dashOffset, dashArray) - (dashArray * dashRatio));
     }
     if (useColors == 1.) {
+        // int y = vColorPointers / 4096;
+        // int x = (vColorPointers -2) - (y *4096);
+        // c *= texture2D(colors, vec2(float(x), float(y)));
         c *= texture2D(colors, vec2(float(vColorPointers-2)/(count), 0.));
+        //
     }
 
     gl_FragColor = c;

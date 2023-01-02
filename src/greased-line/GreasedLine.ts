@@ -111,6 +111,10 @@ export class GreasedLine extends Mesh {
     }
   }
 
+  public isLazy() {
+    return this._lazy;
+  }
+
   public getSegmentWidths() {
     return this._widths;
   }
