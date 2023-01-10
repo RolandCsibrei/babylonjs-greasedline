@@ -10,7 +10,6 @@ import {
   VertexData,
   Scene,
   Matrix,
-  MeshBuilder,
 } from '@babylonjs/core';
 import { GreasedLineMaterial } from './GreasedLineMaterial';
 
@@ -59,8 +58,7 @@ export class GreasedLine extends Mesh {
 
   private _matrixWorld: Matrix;
 
-  private _boundingSphere?: BoundingSphere;
-  private _boundingSphereMesh: Mesh;
+  private _boundingSphere: BoundingSphere;
 
   constructor(
     public name: string,
@@ -89,13 +87,14 @@ export class GreasedLine extends Mesh {
     this._points = [];
     // this._geometry = null
 
-    this._boundingSphereMesh = MeshBuilder.CreateSphere(
-      `${this.name}-bounding-sphere`,
-      {},
-      null
-    );
-    this._boundingSphereMesh.setEnabled(false);
     this._matrixWorld = this.getWorldMatrix();
+
+    this._boundingSphere = new BoundingSphere(
+      Vector3.Zero(),
+      Vector3.Zero(),
+      this._matrixWorld
+    );
+
     if (this._parameters.points) {
       this.addPoints(this._parameters.points);
     }
@@ -172,7 +171,6 @@ export class GreasedLine extends Mesh {
 
       indiceOffset += (p.length / 3) * 2;
 
-      // const { previous, next, uvs, width, side } = this._preprocess(positions)
       const { previous, next, uvs, side } = this._preprocess(positions);
 
       this._vertexPositions.push(...positions);
@@ -181,17 +179,7 @@ export class GreasedLine extends Mesh {
       this._previous.push(...previous);
       this._next.push(...next);
       this._uvs.push(...uvs);
-      // this._segmentWidths.push(...)
       this._side.push(...side);
-
-      // this._vertexPositions=positions
-      // this._indices=indices
-      // this._counters=counters
-      // this._previous=previous
-      // this._next=next
-      // this._uvs=uvs
-      // this._segmentWidth=width
-      // this._side=side
     });
 
     if (!this._lazy) {
@@ -206,7 +194,6 @@ export class GreasedLine extends Mesh {
     this._previous = [];
     this._next = [];
     this._side = [];
-    // this._segmentWidths = []
     this._indices = [];
     this._uvs = [];
     this._colorPointers = [];
@@ -291,12 +278,12 @@ export class GreasedLine extends Mesh {
   }
 
   private _updateRaycastBoundingInfo() {
-    if (!this.geometry) {
-      return;
-    }
-
-    this._boundingSphereMesh.setBoundingInfo(this.getBoundingInfo());
-    this._boundingSphereMesh.bakeTransformIntoVertices(this._matrixWorld);
+    const boundingInfo = this.getBoundingInfo();
+    this._boundingSphere.reConstruct(
+      boundingInfo.minimum,
+      boundingInfo.maximum,
+      this._matrixWorld
+    );
   }
 
   private _compareV3(
@@ -327,7 +314,6 @@ export class GreasedLine extends Mesh {
   private _preprocess(positions: number[]) {
     const l = positions.length / 6;
 
-    let wUp: number, wDown: number;
     let v: number[] = [];
 
     const previous = [];

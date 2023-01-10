@@ -35,7 +35,7 @@ export enum ColorDistribution {
   Start,
   End,
   StartEnd,
-  None, // TODO: StartFill, EndFill, StartEndFill
+  None,
 }
 
 export enum ColorSamplingMode {
@@ -116,7 +116,7 @@ export class GreasedLineBuilder {
         offsets: parameters.offsets,
         pbr: parameters.pbr,
         updatable: parameters.updatable,
-        widths, //: allWitdths,
+        widths,
         widthsDistribution: parameters.widthsDistribution,
       };
       instance = new GreasedLine(
@@ -376,11 +376,6 @@ export class GreasedLineBuilder {
 
           j += widthsectorLength;
         }
-        // } else if (widthsDistribution === WidthsDistribution.None) {
-        //   for (let i = 0; i < widths.length; i++) {
-        //     widthsData.push(widths[i]);
-        //     widthsData.push(widths[i]);
-        //   }
       }
     } else {
       for (let i = 0; i < widths.length; i++) {
@@ -486,8 +481,6 @@ export class GreasedLineBuilder {
         colorsData.push(colors[i]);
       }
     }
-
-    console.log('colorsData', colorsData);
 
     return colorsData;
   }

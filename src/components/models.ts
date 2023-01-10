@@ -52,7 +52,7 @@ export const basicLinks: LinkProps[] = [
   },
   {
     title: 'Lazy',
-    caption: 'Lazy initialization (takes a moment to render )',
+    caption: 'Lazy initialization (may take a moment to init)',
     link: 'Lazy',
   },
   {

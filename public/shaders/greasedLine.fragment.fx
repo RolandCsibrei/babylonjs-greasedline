@@ -17,7 +17,8 @@ uniform vec2 repeat;
 uniform vec2 uvOffset;
 uniform float uvRotation;
 uniform vec2 uvScale;
-uniform float count;
+uniform float colorsWidth;
+uniform float colorsHeight;
 
 varying vec2 vUV;
 varying vec4 vColor;
@@ -51,10 +52,10 @@ void main() {
         c.a *= ceil(mod(vCounters + dashOffset, dashArray) - (dashArray * dashRatio));
     }
     if (useColors == 1.) {
-        // int y = vColorPointers / 4096;
-        // int x = (vColorPointers -2) - (y *4096);
-        // c *= texture2D(colors, vec2(float(x), float(y)));
-        c *= texture2D(colors, vec2(float(vColorPointers-2)/(count), 0.));
+      // float x = vColorPointers % colorsWidth;
+      // float y = vColorPointers / colorsWidth;
+        // c *= texture2D(colors, vec2(x, y));
+        c *= texture2D(colors, vec2(float(vColorPointers)/(colorsWidth), 0.));
         //
     }
 

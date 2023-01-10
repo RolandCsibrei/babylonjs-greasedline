@@ -84,7 +84,8 @@ export class GreasedLineMaterial extends ShaderMaterial {
         uniforms: [
           'worldViewProjection',
           'projection',
-          'count',
+          'colorsWidth',
+          'colorsHeight',
           'colors',
           'useColors',
           'width',
@@ -159,22 +160,27 @@ export class GreasedLineMaterial extends ShaderMaterial {
     this._parameters.dashOffset = dashOffset;
     this.setFloat('dashOffset', dashOffset);
   }
+
   public setDashRatio(dashRatio: number): void {
     this._parameters.dashRatio = dashRatio;
     this.setFloat('dashRatio', dashRatio);
   }
+
   public setVisibility(visibility: number): void {
     this._parameters.visibility = visibility;
     this.setFloat('visibility', visibility);
   }
+
   public setAlphaTest(alphaTest: number): void {
     this._parameters.alphaTest = alphaTest;
     this.setFloat('alphaTest', alphaTest);
   }
+
   public setUvRotation(uvRotation: number): void {
     this._parameters.uvRotation = uvRotation;
     this.setFloat('uvRotation', uvRotation);
   }
+
   public setUseDash(useDash: boolean): void {
     this._parameters.useDash = useDash;
     this.setFloat('useDash', GreasedLineMaterial._bton(useDash));
@@ -248,19 +254,10 @@ export class GreasedLineMaterial extends ShaderMaterial {
   public updateLazy() {
     if (this._parameters.colors) {
       this.setColors(this._parameters.colors, false);
-      //   this._setColorsTexture(
-      //     0,
-      //     this._parameters.colors,
-      //     this._parameters.colorsSamplingMode
-      //   );
     }
   }
 
-  public setColors(
-    colors: Nullable<Uint8Array>,
-    // colorsSamplingMode?: ColorSamplingMode,
-    lazy = false
-  ): void {
+  public setColors(colors: Nullable<Uint8Array>, lazy = false): void {
     if (colors === null || colors.length === 0) {
       this._colorsTexture?.dispose();
       return;
@@ -270,39 +267,32 @@ export class GreasedLineMaterial extends ShaderMaterial {
 
     this._parameters.colors = colors;
 
-    debugger;
-
     if (lazy) {
       return;
     }
-
-    // if (colorsSamplingMode) {
-    //   this._parameters.colorsSamplingMode = colorsSamplingMode;
-    // }
 
     if (this._colorsTexture && origColorsCount === colors.length) {
       this._colorsTexture.update(colors);
     } else {
       this._colorsTexture?.dispose();
-      debugger;
-      const numOfColors = this._parameters.colors.length / 3;
-      const y = 1; // numOfColors / 4096;
+
+      const colorsWidth = this._parameters.colors.length / 3;
+      const colorsHeight = 1;
       this._colorsTexture = new RawTexture(
         colors,
-        numOfColors, // Math.min(numOfColors, 4096),
-        y,
+        colorsWidth,
+        colorsHeight,
         Engine.TEXTUREFORMAT_RGB,
         this.getScene(),
         false,
         true,
-        // colorsSamplingMode === ColorSamplingMode.Smooth
-        // ? RawTexture.LINEAR_LINEAR
         RawTexture.NEAREST_NEAREST
       );
       this._colorsTexture.name = 'greased-line-colors';
-    }
 
-    this.setFloat('count', this._parameters.colors.length / 3);
-    this.setTexture('colors', this._colorsTexture);
+      this.setFloat('colorsWidth', colorsWidth);
+      this.setFloat('colorsHeight', colorsHeight);
+      this.setTexture('colors', this._colorsTexture);
+    }
   }
 }

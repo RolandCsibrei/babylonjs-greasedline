@@ -34,8 +34,8 @@ vec2 fix( vec4 i, float aspect ) {
 
 void main() {
     vCounters = counters;
-    vColorPointers = gl_VertexID;
-    
+    vColorPointers = gl_VertexID - 2;
+
     float aspect = resolution.x / resolution.y;
 
     vColor = vec4( color, opacity );
