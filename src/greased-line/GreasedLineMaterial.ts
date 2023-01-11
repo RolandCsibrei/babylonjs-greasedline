@@ -12,7 +12,7 @@ import {
   Engine,
   Nullable,
 } from '@babylonjs/core';
-import { ColorDistribution, ColorSamplingMode } from './GraesedLineBuilder';
+import { ColorDistribution } from './GraesedLineBuilder';
 
 export interface GreasedLineMaterialParameters {
   color?: Color3;
@@ -21,7 +21,6 @@ export interface GreasedLineMaterialParameters {
 
   useColors?: boolean;
   colors?: Uint8Array;
-  colorsSamplingMode?: ColorSamplingMode;
   colorDistribution?: ColorDistribution;
 
   sizeAttenuation?: boolean;

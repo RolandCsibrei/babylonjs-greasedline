@@ -86,6 +86,11 @@ export const basicLinks: LinkProps[] = [
     link: 'Caps',
   },
   {
+    title: 'Raycast',
+    caption: 'Raycasting',
+    link: 'Raycast',
+  },
+  {
     title: 'Blend mode',
     caption: 'Coming soon...',
     link: 'Blend',

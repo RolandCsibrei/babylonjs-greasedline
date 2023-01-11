@@ -172,6 +172,16 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/Raycast',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('src/pages/RaycastPage.vue'),
+      },
+    ],
+  },
+  {
     path: '/',
     component: () => import('layouts/IntroLayout.vue'),
     children: [

@@ -85,7 +85,6 @@ export class GreasedLine extends Mesh {
     this._colorPointers = [];
 
     this._points = [];
-    // this._geometry = null
 
     this._matrixWorld = this.getWorldMatrix();
 
@@ -256,10 +255,7 @@ export class GreasedLine extends Mesh {
           vEnd,
           precision / 1000
         );
-        console.log('distance', distance, threshold);
         if (distance !== -1) {
-          console.log(vStart, vEnd);
-
           intersects.push({
             distance: distance,
             point: raycaster.direction
@@ -320,7 +316,6 @@ export class GreasedLine extends Mesh {
     const next = [];
     const side = [];
     const uvs = [];
-    // const width = []
 
     if (this._compareV3(0, l - 1, positions)) {
       v = this._copyV3(l - 2, positions);
@@ -333,19 +328,6 @@ export class GreasedLine extends Mesh {
     for (let j = 0; j < l; j++) {
       side.push(1);
       side.push(-1);
-
-      // if (this._parameters.widths) {
-      //   wUp = this._parameters.widths[j * 2]
-      //   wDown = this._parameters.widths[j * 2 + 1]
-      // } else if (this._parameters.widthCallback) {
-      //   ;[wUp, wDown] = this._parameters.widthCallback(j)
-      // } else {
-      //   wUp = 1
-      //   wDown = 1
-      // }
-
-      // width.push(wUp)
-      // width.push(wDown)
 
       // uvs
       uvs.push(j / (l - 1), 0);
@@ -400,8 +382,6 @@ export class GreasedLine extends Mesh {
 
     const countersBuffer = new Buffer(engine, this._counters, false, 1);
     this.setVerticesBuffer(countersBuffer.createVertexBuffer('counters', 0, 1));
-
-    console.log('segment width', this._widths);
 
     const widthBuffer = new Buffer(engine, this._widths, this._updatable, 1);
     this.setVerticesBuffer(widthBuffer.createVertexBuffer('widths', 0, 1));
