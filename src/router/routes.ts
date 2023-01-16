@@ -241,7 +241,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: '',
-        component: () => import('src/pages/demos/GMP.vue'),
+        component: () => import('src/pages/demos/GeometryDrawPage.vue'),
       },
     ],
   },

@@ -30,6 +30,15 @@ export interface GreasedLineParameters {
   pbr?: boolean;
 }
 
+export enum ColorDistribution {
+  Repeat,
+  Even,
+  Start,
+  End,
+  StartEnd,
+  None,
+}
+
 export enum WidthsDistribution {
   Repeat,
   Even,

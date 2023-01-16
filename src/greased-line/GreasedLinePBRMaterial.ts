@@ -11,7 +11,7 @@ import {
   Vector2,
 } from '@babylonjs/core';
 import { PBRCustomMaterial } from '@babylonjs/materials';
-import { ColorDistribution, ColorSamplingMode } from './GraesedLineBuilder';
+import { ColorDistribution } from './GraesedLineBuilder';
 
 export interface GreasedLinePBRMaterialParameters {
   lazy?: boolean;
@@ -19,7 +19,6 @@ export interface GreasedLinePBRMaterialParameters {
 
   useColors?: boolean;
   colors?: Uint8Array;
-  colorsSamplingMode?: ColorSamplingMode;
   colorDistribution?: ColorDistribution;
 
   sizeAttenuation?: boolean;

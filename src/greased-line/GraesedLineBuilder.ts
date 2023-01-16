@@ -15,6 +15,7 @@ import {
 } from '@babylonjs/core';
 
 import {
+  ColorDistribution,
   GreasedLine,
   GreasedLineParameters,
   GreasedLinePoints,
@@ -30,15 +31,6 @@ import {
   GreasedLinePBRMaterial,
   GreasedLinePBRMaterialParameters,
 } from './GreasedLinePBRMaterial';
-
-export enum ColorDistribution {
-  Repeat,
-  Even,
-  Start,
-  End,
-  StartEnd,
-  None,
-}
 
 export interface GreasedLineBuilderParameters {
   lazy?: boolean;
@@ -85,10 +77,10 @@ export interface GreasedLineBuilderParameters {
 
 export const GreasedLineBuilder = {
   CreateGreasedLine,
-  ConvertPoints,
-  NormalizeWidthTable,
-  NormalizeColorTable,
   Color3toUint8,
+  ConvertPoints,
+  NormalizeColorTable,
+  NormalizeWidthTable,
   TextureFromColors,
 };
 

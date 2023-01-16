@@ -1,4 +1,4 @@
-import { Vector3 } from '@babylonjs/core';
+import { Mesh, Vector3, VertexBuffer } from '@babylonjs/core';
 
 interface SubLine {
   point1: Vector3;
@@ -9,6 +9,45 @@ interface SubLine {
 interface SubLinesMinMax {
   min: number;
   max: number;
+}
+
+export function meshesToLines(meshes: Mesh[]) {
+  const points: Vector3[][] = [];
+
+  meshes.forEach((m) => {
+    const vertices = m.getVerticesData(VertexBuffer.PositionKind);
+    const indices = m.getIndices();
+    if (vertices && indices) {
+      for (let i = 0, ii = 0; i < indices.length; i++) {
+        const vi1 = indices[ii++] * 3;
+        const vi2 = indices[ii++] * 3;
+        const vi3 = indices[ii++] * 3;
+
+        const p1 = new Vector3(
+          vertices[vi1],
+          vertices[vi1 + 1],
+          vertices[vi1 + 2]
+        );
+        const p2 = new Vector3(
+          vertices[vi2],
+          vertices[vi2 + 1],
+          vertices[vi2 + 2]
+        );
+        const p3 = new Vector3(
+          vertices[vi3],
+          vertices[vi3 + 1],
+          vertices[vi3 + 2]
+        );
+
+        if (p1.length() + p2.length() + p3.length() === 0) {
+          continue;
+        }
+        points.push([p1, p2, p3, p1]);
+      }
+    }
+  });
+
+  return points;
 }
 
 export function getLineLength(points: Vector3[]): number {
