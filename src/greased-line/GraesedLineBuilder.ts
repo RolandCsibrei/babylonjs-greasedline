@@ -15,11 +15,9 @@ import {
 } from '@babylonjs/core';
 
 import {
-  ColorDistribution,
   GreasedLine,
   GreasedLineParameters,
   GreasedLinePoints,
-  WidthsDistribution,
 } from './GreasedLine';
 
 import {
@@ -32,12 +30,26 @@ import {
   GreasedLinePBRMaterialParameters,
 } from './GreasedLinePBRMaterial';
 
+export const COLOR_DISTRIBUTION_NONE = 0;
+export const COLOR_DISTRIBUTION_REPEAT = 1;
+export const COLOR_DISTRIBUTION_EVEN = 2;
+export const COLOR_DISTRIBUTION_START = 3;
+export const COLOR_DISTRIBUTION_END = 4;
+export const COLOR_DISTRIBUTION_START_END = 5;
+
+export const WIDTH_DISTRIBUTION_NONE = 0;
+export const WIDTH_DISTRIBUTION_REPEAT = 1;
+export const WIDTH_DISTRIBUTION_EVEN = 2;
+export const WIDTH_DISTRIBUTION_START = 3;
+export const WIDTH_DISTRIBUTION_END = 4;
+export const WIDTH_DISTRIBUTION_START_END = 5;
+
 export interface GreasedLineBuilderParameters {
   lazy?: boolean;
 
   points: GreasedLinePoints;
   widths?: number[];
-  widthsDistribution?: WidthsDistribution;
+  widthsDistribution?: number;
   offsets?: number[];
   instance?: GreasedLine;
   updatable?: boolean;
@@ -51,7 +63,7 @@ export interface GreasedLineBuilderParameters {
 
   useColors?: boolean;
   colors?: Color3[];
-  colorDistribution?: ColorDistribution;
+  colorDistribution?: number;
 
   sizeAttenuation?: boolean;
   visibility?: number;
@@ -103,7 +115,7 @@ export function CreateGreasedLine(
   const widths = GreasedLineBuilder.NormalizeWidthTable(
     length,
     parameters.widths ?? [],
-    parameters.widthsDistribution ?? WidthsDistribution.Start
+    parameters.widthsDistribution ?? WIDTH_DISTRIBUTION_START
   );
 
   if (!parameters.instance) {
@@ -132,7 +144,7 @@ export function CreateGreasedLine(
     ? GreasedLineBuilder.NormalizeColorTable(
         length,
         parameters.colors,
-        parameters.colorDistribution ?? ColorDistribution.Start,
+        parameters.colorDistribution ?? COLOR_DISTRIBUTION_START,
         parameters.color
       )
     : undefined;
@@ -255,7 +267,7 @@ export function ConvertPoints(points: GreasedLinePoints): number[][] {
 export function NormalizeWidthTable(
   pointCount: number,
   widths: number[],
-  widthsDistribution: WidthsDistribution,
+  widthsDistribution: number,
   defaultWidthU = 1,
   defaultWidthL = 1
 ) {
@@ -269,7 +281,7 @@ export function NormalizeWidthTable(
 
   if (missingCount > 0) {
     // it is, fill in the missing elements
-    if (widthsDistribution === WidthsDistribution.StartEnd) {
+    if (widthsDistribution === WIDTH_DISTRIBUTION_START_END) {
       const halfCount = Math.floor(widths.length / 2);
 
       // start sector
@@ -291,7 +303,7 @@ export function NormalizeWidthTable(
         widthsData.push(widths[i]);
         widthsData.push(widths[i + 1]);
       }
-    } else if (widthsDistribution === WidthsDistribution.Start) {
+    } else if (widthsDistribution === WIDTH_DISTRIBUTION_START) {
       // start sector
       for (let i = 0; i < widths.length; i += 2) {
         widthsData.push(widths[i]);
@@ -303,7 +315,7 @@ export function NormalizeWidthTable(
         widthsData.push(defaultWidthU);
         widthsData.push(defaultWidthL);
       }
-    } else if (widthsDistribution === WidthsDistribution.End) {
+    } else if (widthsDistribution === WIDTH_DISTRIBUTION_END) {
       // start sector
       for (let i = 0; i < missingCount; i++) {
         widthsData.push(defaultWidthU);
@@ -315,7 +327,7 @@ export function NormalizeWidthTable(
         widthsData.push(widths[i]);
         widthsData.push(widths[i + 1]);
       }
-    } else if (widthsDistribution === WidthsDistribution.Repeat) {
+    } else if (widthsDistribution === WIDTH_DISTRIBUTION_REPEAT) {
       let i = 0;
       for (let x = 0; x < pointCount; x++) {
         widthsData.push(widths[i++]);
@@ -326,7 +338,7 @@ export function NormalizeWidthTable(
           i = 0;
         }
       }
-    } else if (widthsDistribution === WidthsDistribution.Even) {
+    } else if (widthsDistribution === WIDTH_DISTRIBUTION_EVEN) {
       let j = 0;
       const widthsectorLength = widths.length / ((pointCount - 1) * 2);
       for (let x = 0; x < pointCount; x++) {
@@ -350,7 +362,7 @@ export function NormalizeWidthTable(
 export function NormalizeColorTable(
   pointCount: number,
   colors: Color3[],
-  colorDistribution: ColorDistribution,
+  colorDistribution: number,
   defaultColor: Color3 = Color3.White()
 ) {
   // is the color table is shorter the the point table?
@@ -362,7 +374,7 @@ export function NormalizeColorTable(
   const colorsData: Color3[] = [];
   if (missingCount > 0) {
     // it is, fill in the missing elements
-    if (colorDistribution === ColorDistribution.StartEnd) {
+    if (colorDistribution === COLOR_DISTRIBUTION_START_END) {
       const halfCount = Math.floor(colors.length / 2);
 
       // start sector
@@ -382,7 +394,7 @@ export function NormalizeColorTable(
         colorsData.push(colors[i]);
         colorsData.push(colors[i]);
       }
-    } else if (colorDistribution === ColorDistribution.Start) {
+    } else if (colorDistribution === COLOR_DISTRIBUTION_START) {
       // start sector
       for (let i = 0; i < colors.length; i++) {
         colorsData.push(colors[i]);
@@ -394,7 +406,7 @@ export function NormalizeColorTable(
         colorsData.push(defaultColor);
         colorsData.push(defaultColor);
       }
-    } else if (colorDistribution === ColorDistribution.End) {
+    } else if (colorDistribution === COLOR_DISTRIBUTION_END) {
       // start sector
       for (let i = 0; i < missingCount - 1; i++) {
         colorsData.push(defaultColor);
@@ -406,7 +418,7 @@ export function NormalizeColorTable(
         colorsData.push(colors[i]);
         colorsData.push(colors[i]);
       }
-    } else if (colorDistribution === ColorDistribution.Repeat) {
+    } else if (colorDistribution === COLOR_DISTRIBUTION_REPEAT) {
       let i = 0;
       for (let x = 0; x < pointCount; x++) {
         colorsData.push(colors[i]);
@@ -419,7 +431,7 @@ export function NormalizeColorTable(
           i = 0;
         }
       }
-    } else if (colorDistribution === ColorDistribution.Even) {
+    } else if (colorDistribution === COLOR_DISTRIBUTION_EVEN) {
       let j = 0;
       const colorSectorLength = colors.length / (pointCount - 1);
       for (let x = 0; x < pointCount - 1; x++) {
@@ -430,7 +442,7 @@ export function NormalizeColorTable(
 
         j += colorSectorLength;
       }
-    } else if (colorDistribution === ColorDistribution.None) {
+    } else if (colorDistribution === COLOR_DISTRIBUTION_NONE) {
       for (let i = 0; i < colors.length; i++) {
         colorsData.push(colors[i]);
         colorsData.push(colors[i]);

@@ -23,30 +23,26 @@ export type GreasedLinePoints =
 export interface GreasedLineParameters {
   points: number[][];
   widths?: number[];
-  widthsDistribution?: WidthsDistribution;
+  widthsDistribution?: number;
   offsets?: number[];
   instance?: GreasedLine;
   updatable?: boolean;
   pbr?: boolean;
 }
 
-export enum ColorDistribution {
-  Repeat,
-  Even,
-  Start,
-  End,
-  StartEnd,
-  None,
-}
+export const COLOR_DISTRIBUTION_NONE = 0;
+export const COLOR_DISTRIBUTION_REPEAT = 1;
+export const COLOR_DISTRIBUTION_EVEN = 2;
+export const COLOR_DISTRIBUTION_START = 3;
+export const COLOR_DISTRIBUTION_END = 4;
+export const COLOR_DISTRIBUTION_START_END = 5;
 
-export enum WidthsDistribution {
-  Repeat,
-  Even,
-  Start,
-  End,
-  StartEnd,
-  // None,
-}
+export const WIDTH_DISTRIBUTION_NONE = 0;
+export const WIDTH_DISTRIBUTION_REPEAT = 1;
+export const WIDTH_DISTRIBUTION_EVEN = 2;
+export const WIDTH_DISTRIBUTION_START = 3;
+export const WIDTH_DISTRIBUTION_END = 4;
+export const WIDTH_DISTRIBUTION_START_END = 5;
 
 export class GreasedLine extends Mesh {
   private _vertexPositions: number[];
@@ -366,7 +362,6 @@ export class GreasedLine extends Mesh {
       previous,
       next,
       uvs,
-      // width,
       side,
     };
   }

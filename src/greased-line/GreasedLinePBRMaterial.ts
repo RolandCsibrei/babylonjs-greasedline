@@ -11,7 +11,6 @@ import {
   Vector2,
 } from '@babylonjs/core';
 import { PBRCustomMaterial } from '@babylonjs/materials';
-import { ColorDistribution } from './GraesedLineBuilder';
 
 export interface GreasedLinePBRMaterialParameters {
   lazy?: boolean;
@@ -19,7 +18,7 @@ export interface GreasedLinePBRMaterialParameters {
 
   useColors?: boolean;
   colors?: Uint8Array;
-  colorDistribution?: ColorDistribution;
+  colorDistribution?: number;
 
   sizeAttenuation?: boolean;
   visibility?: number;
@@ -127,9 +126,7 @@ export class GreasedLinePBRMaterial extends PBRCustomMaterial {
             this.getScene(),
             false,
             true,
-            parameters.colorsSamplingMode === ColorSamplingMode.Smooth
-              ? RawTexture.LINEAR_LINEAR
-              : RawTexture.NEAREST_NEAREST
+            RawTexture.NEAREST_NEAREST
           );
           this._colorsTexture.name = 'greased-line-colors';
         }
