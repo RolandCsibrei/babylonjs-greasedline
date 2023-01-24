@@ -1,5 +1,5 @@
 <template>
-  <canvas ref="canvas" class="canvas"></canvas>
+  <canvas ref="canvas"></canvas>
   <CodeSnippets :codeSnippets="codeSnippets" />
 </template>
 

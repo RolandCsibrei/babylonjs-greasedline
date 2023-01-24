@@ -27,16 +27,16 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     {
       points,
       width: 10,
-      pbr: true
+      // pbr: true
     },
     scene
   )
 
-  const pbr = line1.material as GreasedLinePBRMaterial
-  pbr.emissiveColor = new Color3(1.0, 0.766, 0.336);
+  // const pbr = line1.material as GreasedLinePBRMaterial
+  // pbr.emissiveColor = new Color3(1.0, 0.766, 0.336);
 
-  camera.zoomOnFactor = 1.3;
-  camera.zoomOn([line1]);
+  // camera.zoomOnFactor = 1.3;
+  // camera.zoomOn([line1]);
 
 }
 

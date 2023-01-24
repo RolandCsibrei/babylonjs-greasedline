@@ -1,8 +1,8 @@
-import { Engine, RawTexture, Scene, SubMesh } from '@babylonjs/core';
 /**
  * @author roland@babylonjs.xyz
  */
 
+import { Engine, RawTexture, Scene, SubMesh } from '@babylonjs/core';
 import { MaterialPluginBase, UniformBuffer } from '@babylonjs/core';
 import { Material } from '@babylonjs/core/Materials/material';
 import { Vector2 } from '@babylonjs/core/Maths/math.vector';

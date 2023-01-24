@@ -7,6 +7,7 @@ import {
   Engine,
   EngineStore,
   Nullable,
+  PBRMaterial,
   RawTexture,
   Scene,
   Texture,
@@ -14,6 +15,7 @@ import {
   Vector3,
 } from '@babylonjs/core';
 
+import { GreasedLinePBRPluginMaterial } from './GreasedLinePBRPluginMaterial';
 import {
   GreasedLine,
   GreasedLineParameters,
@@ -30,19 +32,19 @@ import {
   GreasedLinePBRMaterialParameters,
 } from './GreasedLinePBRMaterial';
 
-export const COLOR_DISTRIBUTION_NONE = 0;
-export const COLOR_DISTRIBUTION_REPEAT = 1;
-export const COLOR_DISTRIBUTION_EVEN = 2;
-export const COLOR_DISTRIBUTION_START = 3;
-export const COLOR_DISTRIBUTION_END = 4;
-export const COLOR_DISTRIBUTION_START_END = 5;
+const COLOR_DISTRIBUTION_NONE = 0;
+const COLOR_DISTRIBUTION_REPEAT = 1;
+const COLOR_DISTRIBUTION_EVEN = 2;
+const COLOR_DISTRIBUTION_START = 3;
+const COLOR_DISTRIBUTION_END = 4;
+const COLOR_DISTRIBUTION_START_END = 5;
 
-export const WIDTH_DISTRIBUTION_NONE = 0;
-export const WIDTH_DISTRIBUTION_REPEAT = 1;
-export const WIDTH_DISTRIBUTION_EVEN = 2;
-export const WIDTH_DISTRIBUTION_START = 3;
-export const WIDTH_DISTRIBUTION_END = 4;
-export const WIDTH_DISTRIBUTION_START_END = 5;
+const WIDTH_DISTRIBUTION_NONE = 0;
+const WIDTH_DISTRIBUTION_REPEAT = 1;
+const WIDTH_DISTRIBUTION_EVEN = 2;
+const WIDTH_DISTRIBUTION_START = 3;
+const WIDTH_DISTRIBUTION_END = 4;
+const WIDTH_DISTRIBUTION_START_END = 5;
 
 export interface GreasedLineBuilderParameters {
   lazy?: boolean;
@@ -94,6 +96,20 @@ export const GreasedLineBuilder = {
   NormalizeColorTable,
   NormalizeWidthTable,
   TextureFromColors,
+
+  COLOR_DISTRIBUTION_NONE,
+  COLOR_DISTRIBUTION_REPEAT,
+  COLOR_DISTRIBUTION_EVEN,
+  COLOR_DISTRIBUTION_START,
+  COLOR_DISTRIBUTION_END,
+  COLOR_DISTRIBUTION_START_END,
+
+  WIDTH_DISTRIBUTION_NONE,
+  WIDTH_DISTRIBUTION_REPEAT,
+  WIDTH_DISTRIBUTION_EVEN,
+  WIDTH_DISTRIBUTION_START,
+  WIDTH_DISTRIBUTION_END,
+  WIDTH_DISTRIBUTION_START_END,
 };
 
 export function CreateGreasedLine(
@@ -167,8 +183,10 @@ export function CreateGreasedLine(
         initialMaterialParameters.colors =
           GreasedLineBuilder.Color3toUint8(colors);
       }
-      instance.material = new GreasedLinePBRMaterial(
-        name,
+      instance.material = new PBRMaterial(name, scene);
+
+      new GreasedLinePBRPluginMaterial(
+        instance.material,
         scene,
         initialMaterialParameters
       );

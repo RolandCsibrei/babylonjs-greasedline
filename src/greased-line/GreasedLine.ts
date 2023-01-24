@@ -29,7 +29,6 @@ export interface GreasedLineParameters {
   updatable?: boolean;
   pbr?: boolean;
 }
-
 export const COLOR_DISTRIBUTION_NONE = 0;
 export const COLOR_DISTRIBUTION_REPEAT = 1;
 export const COLOR_DISTRIBUTION_EVEN = 2;

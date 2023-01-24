@@ -7,11 +7,10 @@
 <script setup lang="ts">
 import { ArcRotateCamera, Color3, CubeTexture, GlowLayer, KeyboardEventTypes, MeshBuilder, Scalar, Scene, StandardMaterial, Texture, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
-import { GreasedLine, WidthsDistribution } from 'src/greased-line/GreasedLine';
+import { GreasedLine } from 'src/greased-line/GreasedLine';
 import { GreasedLineMaterial } from 'src/greased-line/GreasedLineMaterial';
 import { onMounted, ref } from 'vue';
 import { GreasedLineBuilder } from '../../greased-line/GraesedLineBuilder';
-import CodeSnippets from 'src/components/CodeSnippets.vue';
 
 const info = [
   'Press any key to toggle animation'
@@ -113,7 +112,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
         useColors: true,
         colors,
 
-        widthsDistribution: WidthsDistribution.Start,
+        widthsDistribution: GreasedLineBuilder.WIDTH_DISTRIBUTION_START,
         visibility: 0.01,
       },
       scene
