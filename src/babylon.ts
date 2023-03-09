@@ -34,11 +34,8 @@ export const init = (
   }
 
   if (pbr) {
-    // createPBRSkybox(scene);
+    // createPBRSkybox(scene);1
     createHemisphericlight(scene);
-
-    // const hdrTexture = new CubeTexture('/textures/environment.dds', scene);
-    // scene.createDefaultSkybox(hdrTexture, true, 10000);
   }
   engine.runRenderLoop(() => {
     scene.render();
@@ -48,7 +45,7 @@ export const init = (
 };
 
 export const createHemisphericlight = (scene: Scene) => {
-  const light = new HemisphericLight('light1', new Vector3(0, 1, 0), scene);
+  const light = new HemisphericLight('light1', new Vector3(1, 1, 1), scene);
   return light;
 };
 
@@ -135,18 +132,20 @@ export const createArcRotateCamera = (
 };
 
 export const createPBRSkybox = (scene: Scene) => {
-  const environmentTexture = CubeTexture.CreateFromPrefilteredData(
-    'environments/environment-specular.env',
-    scene
-  );
+  const hdrTexture = new CubeTexture('/environments/environment.dds', scene);
+  const skyboxMesh = scene.createDefaultSkybox(hdrTexture, true, 10000);
 
-  const skyboxMesh = scene.createDefaultSkybox(
-    environmentTexture,
-    true,
-    2000,
-    0.5,
-    true
-  );
+  // const environmentTexture = CubeTexture.CreateFromPrefilteredData(
+  //   '/environments/environment.dds',
+  //   scene
+  // );
+  // const skyboxMesh = scene.createDefaultSkybox(
+  //   environmentTexture,
+  //   true,
+  //   2000,
+  //   0.5,
+  //   true
+  // );
 
   return skyboxMesh;
 };

@@ -1,16 +1,18 @@
 <template>
   <canvas ref="canvas" class="canvas"></canvas>
-  <CodeSnippets :codeSnippets="codeSnippets" position="top-right" />
-  <CodeSnippets :codeSnippets="codeSnippetsRight" position="left" />
+  <!-- <CodeSnippets :codeSnippets="codeSnippets" position="top-right" /> -->
+  <!-- <CodeSnippets :codeSnippets="codeSnippetsRight" position="left" /> -->
 </template>
 
 <script setup lang="ts">
-import { ArcRotateCamera, Color3, CubeTexture, Scalar, Scene, Vector3 } from '@babylonjs/core';
+import { ArcRotateCamera, Color3, MeshBuilder, PBRMaterial, Scalar, Scene, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
 import { GreasedLineBuilder } from '../../greased-line/GraesedLineBuilder';
 import CodeSnippets from 'src/components/CodeSnippets.vue';
 import { GreasedLinePBRMaterial } from 'src/greased-line/GreasedLinePBRMaterial';
+import { GreasedLinePBRMaterialParameters, GreasedLinePBRPluginMaterial } from 'src/greased-line/GreasedLinePBRPluginMaterial';
+import { GreasedLinePBRPluginMaterial2 } from 'src/greased-line/GreasedLinePBRPluginMaterial2';
 
 const codeSnippets = [
   `  // all available parameters and commented out which are not supported with PBR
@@ -80,6 +82,30 @@ onMounted(() => {
 });
 
 const demo = (scene: Scene, camera: ArcRotateCamera) => {
+
+  const sphere = MeshBuilder.CreateSphere('sphere', { diameter: 5 }, scene)
+  const material = new PBRMaterial('sphere', scene);
+
+  const initialMaterialParameters: GreasedLinePBRMaterialParameters = {
+  }
+
+  new GreasedLinePBRPluginMaterial(
+    material,
+    scene,
+    initialMaterialParameters
+  );
+
+  // material.emissiveColor = new Color3(1.0, 0.766, 0.336);
+
+  // const counters = new Float32Array(2415);
+  // for (let i = 0; i < counters.length; i++) {
+  //   counters[i] = i / 2000;
+  // // }
+  // console.log(counters?.length);
+  // sphere.setVerticesData('counters', counters, false, 1)
+
+  sphere.material = material;
+  sphere.setEnabled(false)
 
   const points = [new Vector3(-1, 0, 0), new Vector3(1, 0, 0)]
   const line1 = GreasedLineBuilder.CreateGreasedLine(

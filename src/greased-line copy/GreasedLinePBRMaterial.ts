@@ -1,3 +1,7 @@
+/**
+ * @author roland@babylonjs.xyz
+ */
+
 import {
   Engine,
   Matrix,

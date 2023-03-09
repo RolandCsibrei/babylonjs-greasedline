@@ -1,7 +1,6 @@
 <template>
   <canvas ref="canvas" class="canvas"></canvas>
-  <CodeSnippets :code-snippets="info" :position="'top-right'" />
-
+  <CodeSnippets :codeSnippets="info" :position="'top-right'" />
 </template>
 
 <script setup lang="ts">
@@ -11,9 +10,11 @@ import { GreasedLine } from 'src/greased-line/GreasedLine';
 import { GreasedLineMaterial } from 'src/greased-line/GreasedLineMaterial';
 import { onMounted, ref } from 'vue';
 import { GreasedLineBuilder } from '../../greased-line/GraesedLineBuilder';
+import CodeSnippets from 'src/components/CodeSnippets.vue';
+
 
 const info = [
-  'Press any key to toggle animation'
+  'Press any key to toggle animation',
 ]
 
 interface Star {

@@ -118,8 +118,8 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
   camera.zoomOnFactor = 1.3
   camera.zoomOn([line1, line2, line3])
 
-  camera.position.x -= 5
-  camera.target.x -= 5
+  // camera.position.x -= 5
+  // camera.target.x -= 5
 }
 </script>
 

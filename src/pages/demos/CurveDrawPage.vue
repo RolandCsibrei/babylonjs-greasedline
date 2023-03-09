@@ -7,7 +7,6 @@
 import { ArcRotateCamera, Color3, GlowLayer, Scene, SceneLoader, Vector3, VertexBuffer } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import CodeSnippets from 'src/components/CodeSnippets.vue';
-import { WidthsDistribution } from 'src/greased-line/GreasedLine';
 import { onMounted, ref } from 'vue';
 import { GreasedLineBuilder } from '../../greased-line/GraesedLineBuilder'
 
@@ -140,7 +139,7 @@ const demo = async (scene: Scene, camera: ArcRotateCamera) => {
         points,
         width,
         widths: widths1,
-        widthsDistribution: WidthsDistribution.Repeat,
+        widthsDistribution: GreasedLineBuilder.WIDTH_DISTRIBUTION_REPEAT,
         color
       },
       scene

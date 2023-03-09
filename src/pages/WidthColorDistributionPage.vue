@@ -7,9 +7,9 @@
 import { ArcRotateCamera, Color3, Color4, Scalar, Scene, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
-import { ColorDistribution, GreasedLineBuilder } from '../greased-line/GraesedLineBuilder'
+import { GreasedLineBuilder } from '../greased-line/GraesedLineBuilder'
 import CodeSnippets from 'src/components/CodeSnippets.vue';
-import { WidthsDistribution } from 'src/greased-line/GreasedLine';
+import { GreasedLine } from 'src/greased-line/GreasedLine';
 
 const codeSnippets = [
   `  const points1 = []
@@ -30,7 +30,7 @@ const codeSnippets = [
       useColors: true,
       widths: widths1,
       width: 40,
-      widthsDistribution: WidthsDistribution.Start,
+      widthsDistribution: GreasedLine.WIDTH_DISTRIBUTION_Start,
       colorDistribution: ColorDistribution.Repeat
     },
     scene
@@ -75,8 +75,8 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       useColors: true,
       widths: widths1,
       width: 40,
-      widthsDistribution: WidthsDistribution.Start,
-      colorDistribution: ColorDistribution.Repeat
+      widthsDistribution: GreasedLine.WIDTH_DISTRIBUTION_START,
+      colorDistribution: GreasedLine.COLOR_DISTRIBUTION_REPEAT
     },
     scene
   )
@@ -102,7 +102,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       colors: colors2,
       useColors: true,
       width: 40,
-      widthsDistribution: WidthsDistribution.End
+      widthsDistribution: GreasedLine.WIDTH_DISTRIBUTION_END
     },
     scene
   )

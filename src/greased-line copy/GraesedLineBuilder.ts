@@ -1,4 +1,3 @@
-import { CubeTexture, MeshBuilder, StandardMaterial } from '@babylonjs/core';
 /**
  * @author roland@babylonjs.xyz
  */
@@ -10,7 +9,6 @@ import {
   Nullable,
   PBRMaterial,
   RawTexture,
-  RegisterMaterialPlugin,
   Scene,
   Texture,
   Vector2,
@@ -187,21 +185,12 @@ export function CreateGreasedLine(
       }
       const material = new PBRMaterial(name, scene);
 
-      const plugin = new GreasedLinePBRPluginMaterial(
-        material,
-        scene,
-        initialMaterialParameters
-      );
-      // const mesh = MeshBuilder.CreateSphere('mesh', { diameter: 4 }, scene);
-      // mesh.material = material;
-      // mesh.convertToFlatShadedMesh();
-      instance.material = material;
-
-      // instance.material = new GreasedLinePBRMaterial(
-      //   name,
+      // new GreasedLinePBRPluginMaterial(
+      //   material,
       //   scene,
       //   initialMaterialParameters
       // );
+      instance.material = material;
     } else {
       const initialMaterialParameters: GreasedLineMaterialParameters = {
         colorDistribution: parameters.colorDistribution,
@@ -230,13 +219,6 @@ export function CreateGreasedLine(
         initialMaterialParameters.colors =
           GreasedLineBuilder.Color3toUint8(colors);
       }
-      // const material = new StandardMaterial(name, scene);
-      // const plugin = new GreasedLinePBRPluginMaterial(
-      //   material,
-      //   scene,
-      //   initialMaterialParameters
-      // );
-      // instance.material = material;
       instance.material = new GreasedLineMaterial(
         name,
         scene,

@@ -29,7 +29,6 @@ export class GreasedLinePBRPluginMaterial extends MaterialPluginBase {
   private _colorsTexture?: RawTexture;
   private _parameters: GreasedLinePBRMaterialParameters;
   private _engine: Engine;
-  private _isEnabled = false;
 
   constructor(
     material: Material,
@@ -55,9 +54,9 @@ export class GreasedLinePBRPluginMaterial extends MaterialPluginBase {
       this._colorsTexture.name = 'greased-line-colors';
     }
 
-    this._parameters = parameters;
+    this._parameters = {};
 
-    this.isEnabled = true;
+    this._enable(true);
   }
 
   getAttributes(attributes: string[]) {
@@ -76,49 +75,30 @@ export class GreasedLinePBRPluginMaterial extends MaterialPluginBase {
   getUniforms() {
     return {
       ubo: [
-        { name: 'greasedLineProjection', size: 16, type: 'mat4' },
-        { name: 'worldViewProjection', size: 16, type: 'mat4' },
-        { name: 'lineWidth', size: 1, type: 'float' },
-        { name: 'resolution', size: 2, type: 'vec2' },
-        { name: 'sizeAttenuation', size: 1, type: 'float' },
-        { name: 'dashArray', size: 1, type: 'float' },
-        { name: 'dashOffset', size: 1, type: 'float' },
-        { name: 'dashRatio', size: 1, type: 'float' },
-        { name: 'useDash', size: 1, type: 'float' },
-        { name: 'greasedLineVisibility', size: 1, type: 'float' },
-        { name: 'colorsCount', size: 1, type: 'float' },
-        { name: 'useColors', size: 1, type: 'float' },
+        // { name: 'colors', size: 3, type: 'vec3' },
+        // { name: 'previous', size: 3, type: 'vec3' },
+        // { name: 'next', size: 3, type: 'vec3' },
+        // { name: 'side', size: 1, type: 'float' },
+        // { name: 'counters', size: 1, type: 'float' },
+        // { name: 'widths', size: 1, type: 'float' },
       ],
       vertex: `
-      uniform float lineWidth;
-      uniform vec2 resolution;
-      uniform float sizeAttenuation;
-      uniform mat4 worldViewProjection;
-      uniform mat4 greasedLineProjection;
+      float lineWidth;
+      vec2 resolution;
+      float sizeAttenuation;
+      mat4 worldViewProjection;
+      mat4 greasedLineProjection;
       `,
       fragment: `
-      uniform float dashArray;
-      uniform float dashOffset;
-      uniform float dashRatio;
-      uniform float useDash;
-      uniform float greasedLineVisibility;
-      uniform float colorsCount;
-      uniform float useColors;
+      float dashArray;
+      float dashOffset;
+      float dashRatio;
+      float useDash;
+      float greasedLineVisibility;
+      float colorsCount;
+      float useColors;
       `,
     };
-  }
-
-  get isEnabled() {
-    return this._isEnabled;
-  }
-
-  set isEnabled(enabled) {
-    if (this._isEnabled === enabled) {
-      return;
-    }
-    this._isEnabled = enabled;
-    this.markAllDefinesAsDirty();
-    this._enable(this._isEnabled);
   }
 
   bindForSubMesh(
@@ -127,63 +107,79 @@ export class GreasedLinePBRPluginMaterial extends MaterialPluginBase {
     engine: Engine,
     subMesh: SubMesh
   ) {
-    if (this._isEnabled) {
-      const activeCamera = this._scene.activeCamera;
-
-      if (activeCamera) {
-        const projection = activeCamera.getProjectionMatrix();
-        uniformBuffer.updateMatrix('greasedLineProjection', projection);
-      }
-
-      const worldViewProjection = Matrix.Identity().multiply(
-        scene.getTransformMatrix()
-      );
-      uniformBuffer.updateMatrix('worldViewProjection', worldViewProjection);
-      uniformBuffer.updateFloat('lineWidth', this._parameters.width ?? 1);
-
-      uniformBuffer.updateFloat(
-        'greasedLineVisibility',
-        this._parameters.visibility ?? 1
-      );
-      uniformBuffer.updateFloat(
-        'useColors',
-        GreasedLinePBRPluginMaterial._bton(this._parameters.useColors)
-      );
-
-      if (this._parameters.resolution) {
-        uniformBuffer.updateFloat2(
-          'resolution',
-          this._parameters.resolution.x,
-          this._parameters.resolution.y
-        );
-      } else {
-        uniformBuffer.updateFloat2(
-          'resolution',
-          this._engine.getRenderWidth(),
-          this._engine.getRenderHeight()
-        );
-      }
-      uniformBuffer.updateFloat(
-        'sizeAttenuation',
-        GreasedLinePBRPluginMaterial._bton(this._parameters.sizeAttenuation)
-      );
-      uniformBuffer.updateFloat('dashArray', this._parameters.dashArray ?? 0);
-      uniformBuffer.updateFloat('dashOffset', this._parameters.dashOffset ?? 0);
-      uniformBuffer.updateFloat('dashRatio', this._parameters.dashRatio ?? 0.5);
-      uniformBuffer.updateFloat(
-        'useDash',
-        GreasedLinePBRPluginMaterial._bton(this._parameters.useDash)
-      );
-
-      uniformBuffer.updateFloat(
-        'useColors',
-        GreasedLinePBRPluginMaterial._bton(this._parameters.useColors)
-      );
-
-      // uniformBuffer.setTexture('colors', this._colorsTexture);
-
-      uniformBuffer.update();
+    const activeCamera = this._scene.activeCamera;
+    if (activeCamera) {
+      const projection = activeCamera.getProjectionMatrix();
+      uniformBuffer.updateMatrix('greasedLineProjection', projection);
     }
+
+    // const previous = subMesh.getMesh().getVerticesData('previous');
+    // if (previous) {
+    //   uniformBuffer.updateUniformArray('previous', previous, previous.length);
+    // }
+
+    // const next = subMesh.getMesh().getVerticesData('next');
+    // if (next) {
+    //   uniformBuffer.updateUniformArray('next', next, next.length);
+    // }
+
+    // const side = subMesh.getMesh().getVerticesData('side');
+    // if (side) {
+    //   uniformBuffer.updateUniformArray('side', side, side.length);
+    // }
+
+    // const counters = subMesh.getMesh().getVerticesData('counters');
+
+    // if (counters) {
+    // uniformBuffer.updateUniformArray('counters', counters, counters.length);
+    // }
+
+    // const widths = subMesh.getMesh().getVerticesData('widths');
+    // if (widths) {
+    //   uniformBuffer.updateUniformArray('widths', widths, widths.length);
+    // }
+
+    const worldViewProjection = Matrix.Identity().multiply(
+      scene.getTransformMatrix()
+    );
+    uniformBuffer.updateMatrix('worldViewProjection', worldViewProjection);
+
+    uniformBuffer.updateFloat(
+      'greasedLineVisibility',
+      this._parameters.visibility ?? 1
+    );
+    uniformBuffer.updateFloat(
+      'useColors',
+      GreasedLinePBRPluginMaterial._bton(this._parameters.useColors)
+    );
+
+    if (this._parameters.resolution) {
+      uniformBuffer.updateFloat2(
+        'resolution',
+        this._parameters.resolution.x,
+        this._parameters.resolution.y
+      );
+    } else {
+      uniformBuffer.updateFloat2(
+        'resolution',
+        this._engine.getRenderWidth(),
+        this._engine.getRenderHeight()
+      );
+    }
+    uniformBuffer.updateFloat(
+      'sizeAttenuation',
+      GreasedLinePBRPluginMaterial._bton(this._parameters.sizeAttenuation)
+    );
+    uniformBuffer.updateFloat('dashArray', this._parameters.dashArray ?? 0);
+    uniformBuffer.updateFloat('dashOffset', this._parameters.dashOffset ?? 0);
+    uniformBuffer.updateFloat('dashRatio', this._parameters.dashRatio ?? 0.5);
+    uniformBuffer.updateFloat(
+      'useDash',
+      GreasedLinePBRPluginMaterial._bton(this._parameters.useDash)
+    );
+    // uniformBuffer.setTexture('colors', this._colorsTexture);
+
+    uniformBuffer.update();
   }
 
   getClassName() {
@@ -203,7 +199,6 @@ export class GreasedLinePBRPluginMaterial extends MaterialPluginBase {
     attribute vec3 offsets;
     // attribute vec2 greasedLineUv;
 
-    // varying vec3 vNormalW;
     varying vec3 vNormal;
     // varying vec2 vUV;
     varying vec4 vColor;
@@ -216,13 +211,18 @@ export class GreasedLinePBRPluginMaterial extends MaterialPluginBase {
       return res;
   }
 `,
-        CUSTOM_VERTEX_UPDATE_NORMAL: `
+
+        CUSTOM_VERTEX_MAIN_END1: `
+vCounters = counters;
+vColorPointers = gl_VertexID;
 `,
 
         CUSTOM_VERTEX_MAIN_END: `
     vCounters = counters;
     vColorPointers = gl_VertexID;
     float aspect = resolution.x / resolution.y;
+
+    // vUV = uv;
 
     mat4 m = worldViewProjection;
     vec3 positionOffset = offsets;
@@ -251,16 +251,13 @@ export class GreasedLinePBRPluginMaterial extends MaterialPluginBase {
     normal.xy *= .5 * w;
     normal *= greasedLineProjection;
     if( sizeAttenuation == 0. ) {
-          normal.xy *= finalPosition.w;
+        normal.xy *= finalPosition.w;
         normal.xy /= ( vec4( resolution, 0., 1. ) * greasedLineProjection ).xy;
     }
 
     finalPosition.xy += normal.xy * side;
 
     gl_Position = finalPosition;
-
-    vNormal= normal.xyz;
-    vPositionW = vec3(finalPosition);
 
 `,
       };
@@ -269,22 +266,17 @@ export class GreasedLinePBRPluginMaterial extends MaterialPluginBase {
     if (shaderType === 'fragment') {
       return {
         CUSTOM_FRAGMENT_DEFINITIONS: `
-
           varying vec3 vNormal;
           varying float vCounters;
           flat in int vColorPointers;
     `,
 
-        CUSTOM_FRAGMENT_MAIN_BEGIN: `
-        //  normalW = vNormalW;
-        //  geometricNormalW = vNormalW;
-        `,
         CUSTOM_FRAGMENT_MAIN_END: `
 
-          if( useDash == 1. ){
-            gl_FragColor.a *= ceil(mod(vCounters + dashOffset, dashArray) - (dashArray * dashRatio));
-          }
-          gl_FragColor.a *= step(vCounters, greasedLineVisibility);
+          // if( useDash == 1. ){
+          //   gl_FragColor.a *= ceil(mod(vCounters + dashOffset, dashArray) - (dashArray * dashRatio));
+          // }
+          // gl_FragColor.a *= step(vCounters, greasedLineVisibility);
 
           // if( gl_FragColor.a < alphaTest ) discard;
 
@@ -292,6 +284,10 @@ export class GreasedLinePBRPluginMaterial extends MaterialPluginBase {
           //   gl_FragColor *= texture2D(colors, vec2(float(vColorPointers-2)/float(colorsCount), 0.));
           // }
 
+
+          float c = float(vCounters)/4.;
+          c = 1.;
+          gl_FragColor = vec4(c,c,c,1.);
     `,
       };
     }

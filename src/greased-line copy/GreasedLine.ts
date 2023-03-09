@@ -371,10 +371,6 @@ export class GreasedLine extends Mesh {
     vertexData.positions = this._vertexPositions;
     vertexData.indices = this._indices;
     vertexData.uvs = this._uvs;
-
-    // const normals: number[] = [];
-    // VertexData.ComputeNormals(this._vertexPositions, this._indices, normals);
-    // vertexData.normals = normals;
     vertexData.applyToMesh(this, false);
 
     const engine = this._scene.getEngine();

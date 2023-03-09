@@ -9,7 +9,7 @@ import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
 import { GreasedLineBuilder } from '../greased-line/GraesedLineBuilder'
 import CodeSnippets from 'src/components/CodeSnippets.vue';
-import { WidthsDistribution } from 'src/greased-line/GreasedLine';
+import { GreasedLine } from 'src/greased-line/GreasedLine';
 
 
 const codeSnippets = [
@@ -25,27 +25,27 @@ const codeSnippets = [
       points: points1,
       widths,
       width: 40, // resulting width = width * widths[index]
-      widthDistribution: WidthDistribution.Start // Default
+      widthDistribution: GreasedLine.WIDTH_DISTRIBUTION_START // Default
     },
     scene)  `,
   `  // line2
   {
-    widthDistribution: WidthDistribution.End
+    widthDistribution: GreasedLine.WIDTH_DISTRIBUTION_END
   }
 
   // line3
   {
-    widthDistribution: WidthDistribution.Even
+    widthDistribution: GreasedLine.WIDTH_DISTRIBUTION_EVEN
   }
 
   // line4
   {
-    widthDistribution: WidthDistribution.StartEnd
+    widthDistribution: GreasedLine.WIDTH_DISTRIBUTION_START_END
   }
 
   // line5
   {
-    widthDistribution: WidthDistribution.Repeat
+    widthDistribution: GreasedLine.WIDTH_DISTRIBUTION_REPEAT
   }`,
 ]
 
@@ -83,7 +83,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       points: points1.map(p => new Vector3(p.x, p.y - 2, p.z)),
       widths,
       width: 40,
-      widthsDistribution: WidthsDistribution.End
+      widthsDistribution: GreasedLine.WIDTH_DISTRIBUTION_END
     },
     scene
   )
@@ -95,7 +95,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       points: points1.map(p => new Vector3(p.x, p.y - 4, p.z)),
       widths,
       width: 40,
-      widthsDistribution: WidthsDistribution.Even
+      widthsDistribution: GreasedLine.WIDTH_DISTRIBUTION_EVEN
     },
     scene
   )
@@ -106,7 +106,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       points: points1.map(p => new Vector3(p.x, p.y - 6, p.z)),
       widths,
       width: 40,
-      widthsDistribution: WidthsDistribution.StartEnd
+      widthsDistribution: GreasedLine.WIDTH_DISTRIBUTION_START_END
     },
     scene
   )
@@ -117,7 +117,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       points: points1.map(p => new Vector3(p.x, p.y - 8, p.z)),
       widths,
       width: 40,
-      widthsDistribution: WidthsDistribution.Repeat
+      widthsDistribution: GreasedLine.WIDTH_DISTRIBUTION_REPEAT
     },
     scene
   )

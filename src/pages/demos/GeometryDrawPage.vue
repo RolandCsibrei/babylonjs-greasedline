@@ -3,9 +3,9 @@
 </template>
 
 <script setup lang="ts">
-import { ArcRotateCamera, Color3, GlowLayer, Scene, SceneLoader, Vector3, VertexBuffer } from '@babylonjs/core';
+import { ArcRotateCamera, Color3, GlowLayer, Scene, SceneLoader } from '@babylonjs/core';
 import { init } from 'src/babylon';
-import { ColorDistribution, WidthsDistribution } from 'src/greased-line/GreasedLine';
+import { GreasedLine } from 'src/greased-line/GreasedLine';
 import { meshesToLines } from 'src/greased-line/lineUtils';
 import { onMounted, ref } from 'vue';
 import { GreasedLineBuilder } from '../../greased-line/GraesedLineBuilder'
@@ -37,11 +37,11 @@ const demo = async (scene: Scene, camera: ArcRotateCamera) => {
       points,
       width: 1,
       widths: widths1,
-      widthsDistribution: WidthsDistribution.Repeat,
+      widthsDistribution: GreasedLine.WIDTH_DISTRIBUTION_REPEAT,
       colors: colors1,
       useColors: true,
       color: Color3.White(),
-      colorDistribution: ColorDistribution.Repeat,
+      colorDistribution: GreasedLine.COLOR_DISTRIBUTION_REPEAT,
     },
     scene
   );

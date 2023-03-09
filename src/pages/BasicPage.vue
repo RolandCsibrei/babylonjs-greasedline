@@ -1,6 +1,6 @@
 <template>
-  <canvas ref="canvas"></canvas>
-  <CodeSnippets :codeSnippets="codeSnippets" />
+  <canvas ref="canvas" class="canvas"></canvas>
+<CodeSnippets :codeSnippets="codeSnippets" />
 </template>
 
 <script setup lang="ts">
