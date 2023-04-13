@@ -40,14 +40,14 @@ vec2 rotateUV(vec2 uv, /*vec2 pivot,*/ float rotation) {
 void main() {
 
     vec4 c = vColor;
-    vec2 uv = rotateUV(vUV * uvScale, uvRotation) + uvOffset;
+    // vec2 uv = rotateUV(vUV * uvScale, uvRotation) + uvOffset;
 
-    if( useMap == 1. ) {
-        c *= texture2D( map, uv * repeat );
-    }
-    if( useAlphaMap == 1. ) {
-        c.a *= texture2D( alphaMap, uv * repeat ).r;
-    }
+    // if( useMap == 1. ) {
+    //     c *= texture2D( map, uv * repeat );
+    // }
+    // if( useAlphaMap == 1. ) {
+    //     c.a *= texture2D( alphaMap, uv * repeat ).r;
+    // }
     if( useDash == 1. ){
         c.a *= ceil(mod(vCounters + dashOffset, dashArray) - (dashArray * dashRatio));
     }
@@ -62,7 +62,7 @@ void main() {
     gl_FragColor = c;
     gl_FragColor.a *= step(vCounters, visibility);
 
-    if( gl_FragColor.a < alphaTest ) discard;
+    // if( gl_FragColor.a < alphaTest ) discard;
 
       //   THREE.ShaderChunk.fog_fragment,
 }

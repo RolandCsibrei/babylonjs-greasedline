@@ -17,7 +17,7 @@ import {
   Vector3,
 } from '@babylonjs/core';
 
-import { GreasedLinePBRPluginMaterial } from './GreasedLinePBRPluginMaterial';
+import { GreasedLinePluginMaterial } from './GreasedLinePluginMaterial';
 import {
   GreasedLine,
   GreasedLineParameters,
@@ -25,14 +25,9 @@ import {
 } from './GreasedLine';
 
 import {
-  GreasedLineMaterial,
-  GreasedLineMaterialParameters,
-} from './GreasedLineMaterial';
-
-import {
-  GreasedLinePBRMaterial,
-  GreasedLinePBRMaterialParameters,
-} from './GreasedLinePBRMaterial';
+  GreasedLineSimpleMaterial,
+  GreasedLineSimpleMaterialParameters,
+} from './GreasedLineSimpleMaterial';
 
 const COLOR_DISTRIBUTION_NONE = 0;
 const COLOR_DISTRIBUTION_REPEAT = 1;
@@ -47,6 +42,29 @@ const WIDTH_DISTRIBUTION_EVEN = 2;
 const WIDTH_DISTRIBUTION_START = 3;
 const WIDTH_DISTRIBUTION_END = 4;
 const WIDTH_DISTRIBUTION_START_END = 5;
+
+const MATERIAL_TYPE_SIMPLE = 0;
+const MATERIAL_TYPE_STANDARD = 1;
+const MATERIAL_TYPE_PBR = 2;
+
+export interface GreasedLineMaterialParameters {
+  lazy?: boolean;
+  width?: number;
+
+  color?: Color3;
+  useColors?: boolean;
+  colors?: Uint8Array;
+  colorDistribution?: number;
+
+  sizeAttenuation?: boolean;
+  visibility?: number;
+
+  resolution?: Vector2;
+  dashArray?: number;
+  dashOffset?: number;
+  dashRatio?: number;
+  useDash?: boolean;
+}
 
 export interface GreasedLineBuilderParameters {
   lazy?: boolean;
@@ -112,6 +130,10 @@ export const GreasedLineBuilder = {
   WIDTH_DISTRIBUTION_START,
   WIDTH_DISTRIBUTION_END,
   WIDTH_DISTRIBUTION_START_END,
+
+  MATERIAL_TYPE_SIMPLE,
+  MATERIAL_TYPE_STANDARD,
+  MATERIAL_TYPE_PBR,
 };
 
 export function CreateGreasedLine(
@@ -168,82 +190,35 @@ export function CreateGreasedLine(
     : undefined;
 
   if (!instance.material) {
-    if (parameters.pbr) {
-      const initialMaterialParameters: GreasedLinePBRMaterialParameters = {
-        colorDistribution: parameters.colorDistribution,
-        dashArray: parameters.dashArray,
-        dashOffset: parameters.dashOffset,
-        dashRatio: parameters.dashRatio,
-        resolution: parameters.resolution,
-        sizeAttenuation: parameters.sizeAttenuation,
-        useColors: parameters.useColors,
-        useDash: parameters.useDash,
-        visibility: parameters.visibility,
-        width: parameters.width,
-      };
-      if (colors) {
-        initialMaterialParameters.colors =
-          GreasedLineBuilder.Color3toUint8(colors);
-      }
-      const material = new PBRMaterial(name, scene);
-
-      const plugin = new GreasedLinePBRPluginMaterial(
-        material,
-        scene,
-        initialMaterialParameters
-      );
-      // const mesh = MeshBuilder.CreateSphere('mesh', { diameter: 4 }, scene);
-      // mesh.material = material;
-      // mesh.convertToFlatShadedMesh();
-      instance.material = material;
-
-      // instance.material = new GreasedLinePBRMaterial(
-      //   name,
-      //   scene,
-      //   initialMaterialParameters
-      // );
-    } else {
-      const initialMaterialParameters: GreasedLineMaterialParameters = {
-        colorDistribution: parameters.colorDistribution,
-        dashArray: parameters.dashArray,
-        dashOffset: parameters.dashOffset,
-        dashRatio: parameters.dashRatio,
-        resolution: parameters.resolution,
-        sizeAttenuation: parameters.sizeAttenuation,
-        useColors: parameters.useColors,
-        useDash: parameters.useDash,
-        visibility: parameters.visibility,
-        width: parameters.width,
-        alphaMap: parameters.alphaMap,
-        alphaTest: parameters.alphaTest,
-        color: parameters.color,
-        map: parameters.map,
-        opacity: parameters.opacity,
-        repeat: parameters.repeat,
-        useAlphaMap: parameters.useAlphaMap,
-        useMap: parameters.useMap,
-        uvOffset: parameters.uvOffset,
-        uvRotation: parameters.uvRotation,
-        uvScale: parameters.uvScale,
-      };
-      if (colors) {
-        initialMaterialParameters.colors =
-          GreasedLineBuilder.Color3toUint8(colors);
-      }
-      // const material = new StandardMaterial(name, scene);
-      // const plugin = new GreasedLinePBRPluginMaterial(
-      //   material,
-      //   scene,
-      //   initialMaterialParameters
-      // );
-      // instance.material = material;
-      instance.material = new GreasedLineMaterial(
-        name,
-        scene,
-        initialMaterialParameters,
-        instance.isLazy()
-      );
+    const initialMaterialParameters: GreasedLineMaterialParameters = {
+      colorDistribution: parameters.colorDistribution,
+      dashArray: parameters.dashArray,
+      dashOffset: parameters.dashOffset,
+      dashRatio: parameters.dashRatio,
+      resolution: parameters.resolution,
+      sizeAttenuation: parameters.sizeAttenuation === undefined ? false : true,
+      useColors: parameters.useColors,
+      useDash: parameters.useDash,
+      visibility: parameters.visibility,
+      width: parameters.width,
+    };
+    if (colors) {
+      initialMaterialParameters.colors =
+        GreasedLineBuilder.Color3toUint8(colors);
     }
+    const material = parameters.pbr
+      ? new PBRMaterial(name, scene)
+      : new StandardMaterial(name, scene);
+
+    const plugin = new GreasedLinePluginMaterial(
+      material,
+      scene,
+      initialMaterialParameters
+    );
+    // const mesh = MeshBuilder.CreateSphere('mesh', { diameter: 4 }, scene);
+    // mesh.material = material;
+    // mesh.convertToFlatShadedMesh();
+    instance.material = material;
   } else {
     if (colors) {
       _SetColors(instance, colors);
@@ -517,7 +492,7 @@ export function TextureFromColors(
 }
 
 function _SetColors(instance: GreasedLine, colors: Color3[]) {
-  if (instance.material instanceof GreasedLineMaterial) {
+  if (instance.material instanceof GreasedLineSimpleMaterial) {
     const currentColors = instance.material.getParameters().colors;
     const colorsUint8 = GreasedLineBuilder.Color3toUint8(colors);
 

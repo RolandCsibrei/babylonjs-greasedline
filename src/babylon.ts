@@ -26,7 +26,7 @@ export const init = (
   const scene = createScene(engine);
   const camera = createArcRotateCamera(canvas, scene);
 
-  // new AxesViewer(scene, 1);
+  // scene.debugLayer.show({});
 
   let grid;
   if (createGrid) {
@@ -34,7 +34,7 @@ export const init = (
   }
 
   if (pbr) {
-    // createPBRSkybox(scene);1
+    createPBRSkybox(scene);
     createHemisphericlight(scene);
   }
   engine.runRenderLoop(() => {
@@ -45,7 +45,7 @@ export const init = (
 };
 
 export const createHemisphericlight = (scene: Scene) => {
-  const light = new HemisphericLight('light1', new Vector3(1, 1, 1), scene);
+  const light = new HemisphericLight('light1', new Vector3(1, 1, -1), scene);
   return light;
 };
 

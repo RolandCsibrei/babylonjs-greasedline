@@ -7,9 +7,9 @@
 import { ArcRotateCamera, Color3, Color4, Scene, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
-import { ColorDistribution, GreasedLineBuilder } from '../greased-line/GraesedLineBuilder'
+import { GreasedLineBuilder } from '../greased-line/GraesedLineBuilder'
 import CodeSnippets from 'src/components/CodeSnippets.vue';
-import { GreasedLineMaterial } from 'src/greased-line/GreasedLineMaterial';
+// import { GreasedLineMaterial } from 'src/greased-line/GreasedLineFastMaterialrial';
 
 const codeSnippets = [
   `  const points1 = [new Vector3(0, 0, 0), new Vector3(10, 0, 0)]
@@ -104,11 +104,11 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
   //
 
   let dashOffset = 0
-  const material = line3.material as GreasedLineMaterial
-  scene.onBeforeRenderObservable.add(() => {
-    material.setDashOffset(dashOffset)
-    dashOffset += 0.001
-  })
+  // const material = line3.material as GreasedLineMaterial
+  // scene.onBeforeRenderObservable.add(() => {
+  //   material.setDashOffset(dashOffset)
+  //   dashOffset += 0.001
+  // })
 
   //
 

@@ -2,32 +2,22 @@
  * @author roland@babylonjs.xyz
  */
 
-import { Engine, RawTexture, Scene, SubMesh } from '@babylonjs/core';
+import {
+  AbstractMesh,
+  Engine,
+  RawTexture,
+  Scene,
+  StandardMaterial,
+  SubMesh,
+} from '@babylonjs/core';
 import { MaterialPluginBase, UniformBuffer } from '@babylonjs/core';
 import { Material } from '@babylonjs/core/Materials/material';
-import { Matrix, Vector2 } from '@babylonjs/core/Maths/math.vector';
+import { Matrix } from '@babylonjs/core/Maths/math.vector';
+import { GreasedLineMaterialParameters } from './GraesedLineBuilder';
 
-export interface GreasedLinePBRMaterialParameters {
-  lazy?: boolean;
-  width?: number;
-
-  useColors?: boolean;
-  colors?: Uint8Array;
-  colorDistribution?: number;
-
-  sizeAttenuation?: boolean;
-  visibility?: number;
-
-  resolution?: Vector2;
-  dashArray?: number;
-  dashOffset?: number;
-  dashRatio?: number;
-  useDash?: boolean;
-}
-
-export class GreasedLinePBRPluginMaterial extends MaterialPluginBase {
+export class GreasedLinePluginMaterial extends MaterialPluginBase {
   private _colorsTexture?: RawTexture;
-  private _parameters: GreasedLinePBRMaterialParameters;
+  private _parameters: GreasedLineMaterialParameters;
   private _engine: Engine;
   private _isEnabled = false;
 
@@ -35,7 +25,7 @@ export class GreasedLinePBRPluginMaterial extends MaterialPluginBase {
     material: Material,
     private _scene: Scene,
 
-    parameters: GreasedLinePBRMaterialParameters
+    parameters: GreasedLineMaterialParameters
   ) {
     super(material, 'GreasedLinePBRPluginMaterial', 200);
 
@@ -70,7 +60,7 @@ export class GreasedLinePBRPluginMaterial extends MaterialPluginBase {
   }
 
   getSamplers(samplers: string[]) {
-    // samplers.push('colors');
+    samplers.push('colors');
   }
 
   getUniforms() {
@@ -80,13 +70,14 @@ export class GreasedLinePBRPluginMaterial extends MaterialPluginBase {
         { name: 'worldViewProjection', size: 16, type: 'mat4' },
         { name: 'lineWidth', size: 1, type: 'float' },
         { name: 'resolution', size: 2, type: 'vec2' },
+        { name: 'color', size: 3, type: 'vec3' },
         { name: 'sizeAttenuation', size: 1, type: 'float' },
         { name: 'dashArray', size: 1, type: 'float' },
         { name: 'dashOffset', size: 1, type: 'float' },
         { name: 'dashRatio', size: 1, type: 'float' },
         { name: 'useDash', size: 1, type: 'float' },
         { name: 'greasedLineVisibility', size: 1, type: 'float' },
-        { name: 'colorsCount', size: 1, type: 'float' },
+        { name: 'colorsWidth', size: 1, type: 'float' },
         { name: 'useColors', size: 1, type: 'float' },
       ],
       vertex: `
@@ -102,8 +93,10 @@ export class GreasedLinePBRPluginMaterial extends MaterialPluginBase {
       uniform float dashRatio;
       uniform float useDash;
       uniform float greasedLineVisibility;
-      uniform float colorsCount;
+      uniform float colorsWidth;
       uniform float useColors;
+      uniform sampler2D colors;
+      uniform vec3 color;
       `,
     };
   }
@@ -145,10 +138,6 @@ export class GreasedLinePBRPluginMaterial extends MaterialPluginBase {
         'greasedLineVisibility',
         this._parameters.visibility ?? 1
       );
-      uniformBuffer.updateFloat(
-        'useColors',
-        GreasedLinePBRPluginMaterial._bton(this._parameters.useColors)
-      );
 
       if (this._parameters.resolution) {
         uniformBuffer.updateFloat2(
@@ -165,25 +154,44 @@ export class GreasedLinePBRPluginMaterial extends MaterialPluginBase {
       }
       uniformBuffer.updateFloat(
         'sizeAttenuation',
-        GreasedLinePBRPluginMaterial._bton(this._parameters.sizeAttenuation)
+        GreasedLinePluginMaterial._bton(this._parameters.sizeAttenuation)
       );
       uniformBuffer.updateFloat('dashArray', this._parameters.dashArray ?? 0);
       uniformBuffer.updateFloat('dashOffset', this._parameters.dashOffset ?? 0);
       uniformBuffer.updateFloat('dashRatio', this._parameters.dashRatio ?? 0.5);
       uniformBuffer.updateFloat(
         'useDash',
-        GreasedLinePBRPluginMaterial._bton(this._parameters.useDash)
+        GreasedLinePluginMaterial._bton(this._parameters.useDash)
       );
 
-      uniformBuffer.updateFloat(
-        'useColors',
-        GreasedLinePBRPluginMaterial._bton(this._parameters.useColors)
-      );
+      if (this._parameters.color) {
+        uniformBuffer.updateColor3('color', this._parameters.color);
+      }
 
-      // uniformBuffer.setTexture('colors', this._colorsTexture);
+      if (this._colorsTexture) {
+        uniformBuffer.updateFloat(
+          'useColors',
+          GreasedLinePluginMaterial._bton(this._parameters.useColors)
+        );
+
+        uniformBuffer.updateFloat(
+          'colorsWidth',
+          this._colorsTexture.getSize().width * 2
+        );
+
+        uniformBuffer.setTexture('colors', this._colorsTexture);
+      }
 
       uniformBuffer.update();
     }
+  }
+
+  prepareDefines(
+    defines: Record<string, unknown> /*, scene: Scene, mesh: AbstractMesh*/
+  ) {
+    const parameters = this._parameters;
+    defines['GLINE_HAS_COLOR'] = !!parameters.color;
+    defines['GLINE_HAS_COLORS'] = !!parameters.colors;
   }
 
   getClassName() {
@@ -201,11 +209,8 @@ export class GreasedLinePBRPluginMaterial extends MaterialPluginBase {
     attribute float widths;
     attribute float counters;
     attribute vec3 offsets;
-    // attribute vec2 greasedLineUv;
 
-    // varying vec3 vNormalW;
     varying vec3 vNormal;
-    // varying vec2 vUV;
     varying vec4 vColor;
     varying float vCounters;
     flat out int vColorPointers;
@@ -240,19 +245,20 @@ export class GreasedLinePBRPluginMaterial extends MaterialPluginBase {
     if( nextP == currentP ) dir = normalize( currentP - prevP );
     else if( prevP == currentP ) dir = normalize( nextP - currentP );
     else {
-        vec2 dir1 = normalize( currentP - prevP );
-        vec2 dir2 = normalize( nextP - currentP );
-        dir = normalize( dir1 + dir2 );
+      vec2 dir1 = normalize( currentP - prevP );
+      vec2 dir2 = normalize( nextP - currentP );
+      dir = normalize( dir1 + dir2 );
 
-        vec2 perp = vec2( -dir1.y, dir1.x );
-        vec2 miter = vec2( -dir.y, dir.x );
+      // vec2 perp = vec2( -dir1.y, dir1.x );
+      // vec2 miter = vec2( -dir.y, dir.x );
+      // w = clamp( w / dot( miter, perp ), 0., 4. * width * segmentWidth );
     }
     vec4 normal = vec4( -dir.y, dir.x, 0., 1. );
     normal.xy *= .5 * w;
     normal *= greasedLineProjection;
     if( sizeAttenuation == 0. ) {
-          normal.xy *= finalPosition.w;
-        normal.xy /= ( vec4( resolution, 0., 1. ) * greasedLineProjection ).xy;
+      normal.xy *= finalPosition.w;
+      normal.xy /= ( vec4( resolution, 0., 1. ) * greasedLineProjection ).xy;
     }
 
     finalPosition.xy += normal.xy * side;
@@ -276,22 +282,33 @@ export class GreasedLinePBRPluginMaterial extends MaterialPluginBase {
     `,
 
         CUSTOM_FRAGMENT_MAIN_BEGIN: `
-        //  normalW = vNormalW;
-        //  geometricNormalW = vNormalW;
         `,
         CUSTOM_FRAGMENT_MAIN_END: `
-
-          if( useDash == 1. ){
-            gl_FragColor.a *= ceil(mod(vCounters + dashOffset, dashArray) - (dashArray * dashRatio));
-          }
           gl_FragColor.a *= step(vCounters, greasedLineVisibility);
+          if( gl_FragColor.a == 0. ) discard;
 
-          // if( gl_FragColor.a < alphaTest ) discard;
+          if(useDash == 1.){
+            gl_FragColor.a *= ceil(mod(vCounters + dashOffset, dashArray) - (dashArray * dashRatio));
+            if(gl_FragColor.a == 0.) discard;
+          }
 
-          // if (useColors == 1.) {
-          //   gl_FragColor *= texture2D(colors, vec2(float(vColorPointers-2)/float(colorsCount), 0.));
-          // }
 
+
+          if (useColors == 1.) {
+            // float x = vColorPointers % colorsWidth;
+            // float y = vColorPointers / colorsWidth;
+            // c *= texture2D(colors, vec2(x, y));
+            gl_FragColor ${
+              (this._material as StandardMaterial).disableLighting ? '' : '*'
+            }= texture2D(colors, vec2(float(vColorPointers)/(colorsWidth), 0.));
+            //
+            // gl_FragColor = texture2D(colors, vec2(0.5,0.));
+            // gl_FragColor = vec4(float(vColorPointers)/5.,0.,0.,1.);
+          }
+
+          #ifdef GLINE_HAS_COLOR
+          gl_FragColor.rgb = color;
+        #endif
     `,
       };
     }

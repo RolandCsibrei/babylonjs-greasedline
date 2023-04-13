@@ -35,7 +35,7 @@ const demo = async (scene: Scene, camera: ArcRotateCamera) => {
     'lines',
     {
       points,
-      width: 1,
+      width: 10,
       widths: widths1,
       widthsDistribution: GreasedLine.WIDTH_DISTRIBUTION_REPEAT,
       colors: colors1,

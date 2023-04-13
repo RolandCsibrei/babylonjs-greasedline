@@ -11,7 +11,7 @@ import {
   Scene,
   Matrix,
 } from '@babylonjs/core';
-import { GreasedLineMaterial } from './GreasedLineMaterial';
+import { GreasedLineSimpleMaterial } from './GreasedLineSimpleMaterial';
 
 export type GreasedLinePoints =
   | Vector3[]
@@ -41,7 +41,7 @@ export class GreasedLine extends Mesh {
   private _indices: number[];
   private _uvs: number[];
   private _counters: number[];
-  private _colorPointers: number[];
+  // private _colorPointers: number[];
   private _points: number[][];
 
   private _offsetsBuffer?: Buffer;
@@ -87,7 +87,7 @@ export class GreasedLine extends Mesh {
     this._widths =
       _parameters.widths ?? new Array(_parameters.points.length).fill(1);
     this._counters = [];
-    this._colorPointers = [];
+    // this._colorPointers = [];
 
     this._points = [];
 
@@ -109,7 +109,7 @@ export class GreasedLine extends Mesh {
     this._drawLine();
     this._updateRaycastBoundingInfo();
 
-    if (this.material instanceof GreasedLineMaterial) {
+    if (this.material instanceof GreasedLineSimpleMaterial) {
       this.material.updateLazy();
     }
   }
@@ -134,9 +134,9 @@ export class GreasedLine extends Mesh {
     this.setPoints(points);
   }
 
-  public get lineCount() {
-    return this._colorPointers.length;
-  }
+  // public get lineCount() {
+  // return this._colorPointers.length;
+  // }
 
   public addPoints(points: number[][]) {
     const numberPoints = points;
@@ -200,7 +200,7 @@ export class GreasedLine extends Mesh {
     this._side = [];
     this._indices = [];
     this._uvs = [];
-    this._colorPointers = [];
+    // this._colorPointers = [];
   }
 
   public setOffsets(offsets: number[]) {
@@ -231,7 +231,7 @@ export class GreasedLine extends Mesh {
     const widths = this._widths;
 
     const lineWidth =
-      (this.material as GreasedLineMaterial).getParameters().width ?? 1;
+      (this.material as GreasedLineSimpleMaterial).getParameters().width ?? 1;
 
     const intersects = [];
     if (indices !== null && positions !== null) {

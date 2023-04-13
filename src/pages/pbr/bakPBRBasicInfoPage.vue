@@ -11,7 +11,7 @@ import { onMounted, ref } from 'vue';
 import { GreasedLineBuilder } from '../../greased-line/GraesedLineBuilder';
 import CodeSnippets from 'src/components/CodeSnippets.vue';
 import { GreasedLinePBRMaterial } from 'src/greased-line/GreasedLinePBRMaterial';
-import { GreasedLinePBRMaterialParameters, GreasedLinePBRPluginMaterial } from 'src/greased-line/GreasedLinePBRPluginMaterial';
+import { GreasedLinePBRMaterialParameters, GreasedLinePBRPluginMaterial } from 'src/greased-line/GreasedLinePluginMaterial
 import { GreasedLinePBRPluginMaterial2 } from 'src/greased-line/GreasedLinePBRPluginMaterial2';
 
 const codeSnippets = [

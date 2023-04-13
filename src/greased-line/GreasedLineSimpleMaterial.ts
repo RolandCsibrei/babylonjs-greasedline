@@ -13,7 +13,7 @@ import {
   Nullable,
 } from '@babylonjs/core';
 
-export interface GreasedLineMaterialParameters {
+export interface GreasedLineSimpleMaterialParameters {
   color?: Color3;
   opacity?: number;
   width?: number;
@@ -44,8 +44,8 @@ export interface GreasedLineMaterialParameters {
   uvScale?: Vector2;
 }
 
-export class GreasedLineMaterial extends ShaderMaterial {
-  private _parameters: GreasedLineMaterialParameters;
+export class GreasedLineSimpleMaterial extends ShaderMaterial {
+  private _parameters: GreasedLineSimpleMaterialParameters;
   private _engine: Engine;
 
   private _colorsTexture?: RawTexture;
@@ -71,7 +71,7 @@ export class GreasedLineMaterial extends ShaderMaterial {
   constructor(
     name: string,
     scene: Scene,
-    parameters: GreasedLineMaterialParameters,
+    parameters: GreasedLineSimpleMaterialParameters,
     private _lazy = false
   ) {
     super(
@@ -133,7 +133,7 @@ export class GreasedLineMaterial extends ShaderMaterial {
     return { ...this._parameters };
   }
 
-  public setParameters(parameters: GreasedLineMaterialParameters) {
+  public setParameters(parameters: GreasedLineSimpleMaterialParameters) {
     this.setWidth(parameters.width ?? 1);
     this.setColor(parameters.color ?? Color3.White());
     this.setOpacity(parameters.opacity ?? 1);
@@ -195,7 +195,7 @@ export class GreasedLineMaterial extends ShaderMaterial {
 
   public setUseDash(useDash: boolean): void {
     this._parameters.useDash = useDash;
-    this.setFloat('useDash', GreasedLineMaterial._bton(useDash));
+    this.setFloat('useDash', GreasedLineSimpleMaterial._bton(useDash));
   }
 
   public setRepeat(repeat: Vector2): void {
@@ -221,7 +221,7 @@ export class GreasedLineMaterial extends ShaderMaterial {
     this._parameters.sizeAttenuation = sizeAttenuation;
     this.setFloat(
       'sizeAttenuation',
-      GreasedLineMaterial._bton(sizeAttenuation)
+      GreasedLineSimpleMaterial._bton(sizeAttenuation)
     );
   }
 
@@ -242,17 +242,17 @@ export class GreasedLineMaterial extends ShaderMaterial {
 
   public setUseColors(useColors: boolean): void {
     this._parameters.useColors = useColors;
-    this.setFloat('useColors', GreasedLineMaterial._bton(useColors));
+    this.setFloat('useColors', GreasedLineSimpleMaterial._bton(useColors));
   }
 
   public setUseMap(useMap: boolean): void {
     this._parameters.useMap = useMap;
-    this.setFloat('useMap', GreasedLineMaterial._bton(useMap));
+    this.setFloat('useMap', GreasedLineSimpleMaterial._bton(useMap));
   }
 
   public setUseAlphaMap(useAlphaMap: boolean): void {
     this._parameters.useAlphaMap = useAlphaMap;
-    this.setFloat('useAlphaMap', GreasedLineMaterial._bton(useAlphaMap));
+    this.setFloat('useAlphaMap', GreasedLineSimpleMaterial._bton(useAlphaMap));
   }
 
   public setMap(map: Texture): void {

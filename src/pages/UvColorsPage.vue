@@ -10,7 +10,7 @@ import { onMounted, ref } from 'vue';
 import { ColorDistribution, ColorSamplingMode, GreasedLineBuilder } from '../greased-line/GraesedLineBuilder'
 import CodeSnippets from 'src/components/CodeSnippets.vue';
 import { WidthsDistribution } from 'src/greased-line/GreasedLine';
-import { GreasedLineMaterial } from 'src/greased-line/GreasedLineMaterial';
+import { GreasedLineMaterial } from 'src/greased-line/GreasedLineFastMaterialrial';
 import { segmentize } from 'src/greased-line/lineUtils';
 
 const codeSnippets = [

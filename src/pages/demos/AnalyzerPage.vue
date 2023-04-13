@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import { Analyser, ArcRotateCamera, Color3, Engine, RawTexture, Scene, Sound, Vector2, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
-import { GreasedLineMaterial } from 'src/greased-line/GreasedLineMaterial';
+import { GreasedLineMaterial } from 'src/greased-line/GreasedLineFastMaterialrial';
 import { onMounted, ref } from 'vue';
 import { GreasedLineBuilder } from '../../greased-line/GraesedLineBuilder'
 

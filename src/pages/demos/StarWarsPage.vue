@@ -7,7 +7,7 @@
 import { ArcRotateCamera, Color3, CubeTexture, GlowLayer, KeyboardEventTypes, MeshBuilder, Scalar, Scene, StandardMaterial, Texture, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { GreasedLine } from 'src/greased-line/GreasedLine';
-import { GreasedLineMaterial } from 'src/greased-line/GreasedLineMaterial';
+import { GreasedLineMaterial } from 'src/greased-line/GreasedLineFastMaterialrial';
 import { onMounted, ref } from 'vue';
 import { GreasedLineBuilder } from '../../greased-line/GraesedLineBuilder';
 import CodeSnippets from 'src/components/CodeSnippets.vue';

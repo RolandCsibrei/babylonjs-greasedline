@@ -53,7 +53,6 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     widths.push(Math.sin(i) * 6 + 2)
     widths.push(Math.sin(i) * 6 + 2)
   }
-  debugger
 
   const line1 = GreasedLineBuilder.CreateGreasedLine('raycast', {
     points: allPoints,

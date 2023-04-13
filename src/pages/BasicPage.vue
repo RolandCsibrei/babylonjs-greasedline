@@ -1,10 +1,10 @@
 <template>
   <canvas ref="canvas" class="canvas"></canvas>
-<CodeSnippets :codeSnippets="codeSnippets" />
+  <CodeSnippets :codeSnippets="codeSnippets" />
 </template>
 
 <script setup lang="ts">
-import { ArcRotateCamera, Scene, Vector3 } from '@babylonjs/core';
+import { ArcRotateCamera, Color3, Scene, StandardMaterial, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
 import { GreasedLineBuilder } from '../greased-line/GraesedLineBuilder'
@@ -91,6 +91,9 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     },
     scene
   )
+
+  const material = line3.material as StandardMaterial
+  material.emissiveColor = Color3.Red()
 
   camera.zoomOnFactor = 1.3
   camera.zoomOn([line1, line2, line3])
