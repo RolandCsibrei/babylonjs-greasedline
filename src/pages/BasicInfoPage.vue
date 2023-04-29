@@ -76,7 +76,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       color: Color3.White(),
       colors: colors3,
       useColors: true,
-      width: 1,
+      width: 0.2,
       sizeAttenuation: false,
       points: points3
     },
@@ -88,7 +88,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
   }
 
 
-  const widths = [1, 1, 1, 8, 20, 20]
+  const widths = [1, 1, 8, 8, 20, 20]
   const offsets = [
     0, 0, 0,
     0, 0, 0,
@@ -119,6 +119,11 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     },
     scene
   )
+
+
+  if (line2.material) {
+    (line2.material as StandardMaterial).disableLighting = true
+  }
 
 
   camera.zoomOnFactor = 1.3;
