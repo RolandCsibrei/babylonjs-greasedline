@@ -7,7 +7,7 @@
 import { ArcRotateCamera, Color3, Scene, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
-import { GreasedLineBuilder } from '../../greased-line/GraesedLineBuilder';
+import { GreasedLineBuilder } from '../../greased-line/graesedLineBuilder';
 import CodeSnippets from 'src/components/CodeSnippets.vue';
 
 const info = [

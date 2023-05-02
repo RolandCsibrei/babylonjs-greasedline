@@ -7,7 +7,7 @@
 import { ArcRotateCamera, Color3, Color4, Scene, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
-import { GreasedLineBuilder } from '../greased-line/GraesedLineBuilder'
+import { GreasedLineBuilder } from '../greased-line/graesedLineBuilder'
 import CodeSnippets from 'src/components/CodeSnippets.vue';
 // import { GreasedLineMaterial } from 'src/greased-line/GreasedLineFastMaterialrial';
 
@@ -64,7 +64,8 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       width: 40,
       useDash: true,
       dashArray: 1 / (5 * 2), // 1 / (num of dashes * 2)
-      dashRatio: 0.5, // dash length ratio 0..1 (0.5 = half empty, half drawn)
+      dashRatio: 0.5, // dash length ratio 0..1 (0.5 = half empty, half drawn),
+      color: Color3.Red()
     },
     scene
   )
@@ -80,7 +81,8 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       width: 40,
       useDash: true,
       dashArray: 1 / (5 * 2), // 1 / (num of dashes * 2)
-      dashRatio: 0.1, // dash length ratio 0..1 (0.1 = 10% empty, 90% drawn)
+      dashRatio: 0.1, // dash length ratio 0..1 (0.1 = 10% empty, 90% drawn),
+      color: Color3.Green()
     },
     scene
   )
@@ -97,6 +99,8 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       useDash: true,
       dashArray: 1 / (50 * 2), // 1 / (num of dashes * 2)
       dashRatio: 0.5, // dash length ratio 0..1 (0.5 = 50% empty, 50% drawn)
+      color: Color3.Blue()
+
     },
     scene
   )
@@ -104,11 +108,11 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
   //
 
   let dashOffset = 0
-  // const material = line3.material as GreasedLineMaterial
-  // scene.onBeforeRenderObservable.add(() => {
-  //   material.setDashOffset(dashOffset)
-  //   dashOffset += 0.001
-  // })
+  const material = line3.greasedLineMaterial
+  scene.onBeforeRenderObservable.add(() => {
+    material.setDashOffset(dashOffset)
+    dashOffset += 0.001
+  })
 
   //
 

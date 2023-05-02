@@ -4,12 +4,12 @@
 </template>
 
 <script setup lang="ts">
-import { ArcRotateCamera, Axis, Color3, Scalar, Scene, Vector3 } from '@babylonjs/core';
+import { ArcRotateCamera, Axis, Color3, Scalar, Scene, StandardMaterial, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
-import { GreasedLineBuilder } from '../greased-line/GraesedLineBuilder';
+import { GreasedLineBuilder } from '../greased-line/graesedLineBuilder';
 import CodeSnippets from 'src/components/CodeSnippets.vue';
-import { GreasedLine } from 'src/greased-line/GreasedLine';
+import { GreasedLineMesh } from 'src/greased-line/greasedLineMesh';
 
 const codeSnippets = [
   `  let instance: GreasedLine | undefined = undefined;
@@ -62,7 +62,7 @@ onMounted(() => {
 });
 
 const demo = (scene: Scene, camera: ArcRotateCamera) => {
-  let instance: GreasedLine | undefined = undefined;
+  let instance: GreasedLineMesh | undefined = undefined;
   const numOfLines = 4096
   const frequency = 5 / numOfLines;
   for (let i = 0; i < numOfLines; i++) {
@@ -71,7 +71,8 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     const r = Math.floor(Math.sin(frequency * i + 0) * (127) + 128);
     const g = Math.floor(Math.sin(frequency * i + 2) * (127) + 128);
     const b = Math.floor(Math.sin(frequency * i + 4) * (127) + 128);
-    const colors = [new Color3(r, g, b)]
+    const color = new Color3(r, g, b)
+    const colors = [color, color]
     for (let j = 0; j < 2; j++) {
       const x = Math.cos(i) * j
       const y = Math.sin(i) * j
@@ -79,6 +80,8 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       points.push(new Vector3(x, y, z));
       widths.push(Scalar.RandomRange(1, 22), Scalar.RandomRange(1, 4))
     }
+
+
     const line1 = GreasedLineBuilder.CreateGreasedLine(
       'instanced-lines',
       {
@@ -98,8 +101,13 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     }
   }
 
+  debugger
+
   if (instance) {
+    (instance.material as StandardMaterial).disableLighting = true
+
     instance.updateLazy()
+
     camera.alpha = -0.69;
     camera.beta = 1.16
     camera.radius = 3.9185

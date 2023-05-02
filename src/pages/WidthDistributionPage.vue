@@ -7,9 +7,9 @@
 import { ArcRotateCamera, Color3, Scene, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
-import { GreasedLineBuilder } from '../greased-line/GraesedLineBuilder'
+import { GreasedLineBuilder } from '../greased-line/graesedLineBuilder'
 import CodeSnippets from 'src/components/CodeSnippets.vue';
-import { GreasedLine } from 'src/greased-line/GreasedLine';
+import { GreasedLineMesh } from 'src/greased-line/greasedLineMesh';
 
 
 const codeSnippets = [
@@ -71,7 +71,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       points: points1,
       color: Color3.Red(),
       widths,
-      width: 40
+      width: 40,
     },
     scene
   )
@@ -84,7 +84,9 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       points: points1.map(p => new Vector3(p.x, p.y - 2, p.z)),
       widths,
       width: 40,
-      widthsDistribution: GreasedLine.WIDTH_DISTRIBUTION_END
+      widthsDistribution: GreasedLineMesh.WIDTH_DISTRIBUTION_END,
+      color: Color3.Green(),
+
     },
     scene
   )
@@ -96,7 +98,9 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       points: points1.map(p => new Vector3(p.x, p.y - 4, p.z)),
       widths,
       width: 40,
-      widthsDistribution: GreasedLine.WIDTH_DISTRIBUTION_EVEN
+      widthsDistribution: GreasedLineMesh.WIDTH_DISTRIBUTION_EVEN,
+      color: Color3.Blue(),
+
     },
     scene
   )
@@ -107,7 +111,9 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       points: points1.map(p => new Vector3(p.x, p.y - 6, p.z)),
       widths,
       width: 40,
-      widthsDistribution: GreasedLine.WIDTH_DISTRIBUTION_START_END
+      widthsDistribution: GreasedLineMesh.WIDTH_DISTRIBUTION_START_END,
+      color: Color3.Yellow(),
+
     },
     scene
   )
@@ -118,7 +124,9 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       points: points1.map(p => new Vector3(p.x, p.y - 8, p.z)),
       widths,
       width: 40,
-      widthsDistribution: GreasedLine.WIDTH_DISTRIBUTION_REPEAT
+      widthsDistribution: GreasedLineMesh.WIDTH_DISTRIBUTION_REPEAT,
+      color: Color3.Magenta(),
+
     },
     scene
   )

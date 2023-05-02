@@ -7,9 +7,9 @@
 import { ArcRotateCamera, Color3, Scene, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
-import { GreasedLineBuilder } from '../greased-line/GraesedLineBuilder'
+import { GreasedLineBuilder } from '../greased-line/graesedLineBuilder'
 import CodeSnippets from 'src/components/CodeSnippets.vue';
-import { GreasedLine } from 'src/greased-line/GreasedLine';
+import { GreasedLineMesh } from 'src/greased-line/greasedLineMesh';
 
 const codeSnippets = [
   `  const points1 = []
@@ -73,11 +73,13 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
   const line1 = GreasedLineBuilder.CreateGreasedLine(
     'basic-line-1',
     {
+      unlit: true, // TODO: this unlits all lines?! WTF
       colors: colors1,
       useColors: true,
       points: points1,
       width: 40,
-      colorDistribution: GreasedLine.COLOR_DISTRIBUTION_START // Default
+      colorDistribution: GreasedLineMesh.COLOR_DISTRIBUTION_START // Default
+
     },
     scene
   )
@@ -91,7 +93,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       useColors: true,
       points: points1.map(p => new Vector3(p.x, p.y - 2, p.z)),
       width: 40,
-      colorDistribution: GreasedLine.COLOR_DISTRIBUTION_END
+      colorDistribution: GreasedLineMesh.COLOR_DISTRIBUTION_END,
     },
     scene
   )
@@ -104,7 +106,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       useColors: true,
       points: points1.map(p => new Vector3(p.x, p.y - 4, p.z)),
       width: 40,
-      colorDistribution: GreasedLine.COLOR_DISTRIBUTION_EVEN
+      colorDistribution: GreasedLineMesh.COLOR_DISTRIBUTION_EVEN
     },
     scene
   )
@@ -116,7 +118,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       useColors: true,
       points: points1.map(p => new Vector3(p.x, p.y - 6, p.z)),
       width: 40,
-      colorDistribution: GreasedLine.COLOR_DISTRIBUTION_START_END
+      colorDistribution: GreasedLineMesh.COLOR_DISTRIBUTION_START_END
     },
     scene
   )
@@ -128,7 +130,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       useColors: true,
       points: points1.map(p => new Vector3(p.x, p.y - 8, p.z)),
       width: 40,
-      colorDistribution: GreasedLine.COLOR_DISTRIBUTION_REPEAT
+      colorDistribution: GreasedLineMesh.COLOR_DISTRIBUTION_REPEAT
     },
     scene
   )
@@ -140,7 +142,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       useColors: true,
       points: points1.map(p => new Vector3(p.x, p.y - 10, p.z)),
       width: 40,
-      colorDistribution: GreasedLine.COLOR_DISTRIBUTION_NONE
+      colorDistribution: GreasedLineMesh.COLOR_DISTRIBUTION_NONE
     },
     scene
   )

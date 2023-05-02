@@ -8,8 +8,9 @@
 import { ArcRotateCamera, Color3, Material, MeshBuilder, PBRMaterial, Scene, StandardMaterial, Texture, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
-import { GreasedLineBuilder } from '../greased-line/GraesedLineBuilder';
+import { GreasedLineBuilder } from '../greased-line/graesedLineBuilder';
 import CodeSnippets from 'src/components/CodeSnippets.vue';
+import { circle } from 'src/greased-line/greasedLineTools';
 
 
 
@@ -23,6 +24,9 @@ onMounted(() => {
 
 const demo = (scene: Scene, camera: ArcRotateCamera) => {
 
+
+
+
   const points = [
     new Vector3(-3, 0, 0),
     new Vector3(3, 0, 0)
@@ -33,7 +37,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     {
       points,
       width: 0.3,
-      color: Color3.Red(),
+      // color: Color3.Red(),
       useDash: true,
       sizeAttenuation: true,
       dashArray: 1 / (10 * 2), // 1 / (num of dashes * 2)
@@ -63,7 +67,6 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     material.roughness = 0.1
   }
 
-
   const points3 = []
   const colors3 = []
   for (let x = 0; x < 10; x += 0.25) {
@@ -73,11 +76,11 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
   const line3 = GreasedLineBuilder.CreateGreasedLine(
     'basic-line-3',
     {
-      color: Color3.White(),
+      // color: Color3.White(),
       colors: colors3,
       useColors: true,
       width: 0.2,
-      sizeAttenuation: false,
+      sizeAttenuation: true,
       points: points3
     },
     scene
@@ -88,25 +91,25 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
   }
 
 
-  const widths = [1, 1, 8, 8, 20, 20]
+  const widths = [1, 1, 4, 4, 8, 8]
   const offsets = [
     0, 0, 0,
     0, 0, 0,
     0, 0, 0,
     0, 0, 0,
     0, 0, 0,
-    0, 1, 0,
+    0, 0, 0,
   ]
   const colors2 = [new Color3(0.5, 0.5, 0.5), new Color3(1, 1, 1)]
   const line2 = GreasedLineBuilder.CreateGreasedLine(
     'basic-line-2',
     {
-      color: Color3.Blue(),
+      // color: Color3.Blue(),
       colors: colors2,
       useColors: true,
       colorDistribution: GreasedLineBuilder.COLOR_DISTRIBUTION_EVEN,
       width: 0.1,
-      sizeAttenuation: false,
+      sizeAttenuation: true,
       widths,
       widthsDistribution: GreasedLineBuilder.WIDTH_DISTRIBUTION_REPEAT,
       offsets,
@@ -129,7 +132,10 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
   camera.zoomOnFactor = 1.3;
   camera.zoomOn([line1, line2, line3]);
   // camera.zoomOn([line2]);
+  // camera.zoomOn([line3]);
 
 };
+
+
 </script>
 

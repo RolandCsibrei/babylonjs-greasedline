@@ -7,7 +7,7 @@
 import { ArcRotateCamera, Color3, Scene, StandardMaterial, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
-import { GreasedLineBuilder } from '../greased-line/GraesedLineBuilder'
+import { GreasedLineBuilder } from '../greased-line/graesedLineBuilder'
 import CodeSnippets from 'src/components/CodeSnippets.vue';
 
 const codeSnippets = [
@@ -63,6 +63,8 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     'basic-line-1',
     {
       points,
+      width: 20,
+      color: Color3.Blue()
     },
     scene
   )
@@ -74,6 +76,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     {
       points: [new Vector3(0, -4, 0), new Vector3(5, -5, 0), new Vector3(10, -4, 0)],
       width: 100,
+      color: Color3.Green()
     },
     scene
   )

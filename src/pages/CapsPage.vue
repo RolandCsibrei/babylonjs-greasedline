@@ -7,10 +7,10 @@
 import { ArcRotateCamera, Color3, Color4, Scene, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
-import { GreasedLineBuilder } from '../greased-line/GraesedLineBuilder'
+import { GreasedLineBuilder } from '../greased-line/graesedLineBuilder'
 import CodeSnippets from 'src/components/CodeSnippets.vue';
-import { getArrowCap, getCircleCap } from 'src/greased-line/lineUtils';
-import { GreasedLine } from 'src/greased-line/GreasedLine';
+import { getArrowCap, getCircleCap } from 'src/greased-line/greasedLineTools';
+import { GreasedLineMesh } from 'src/greased-line/greasedLineMesh';
 
 const codeSnippets = [
   `It's already possible to create rounded or lines with various caps,
@@ -36,10 +36,10 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     {
       points: points1,
       width: 80,
-      widthsDistribution: GreasedLine.WIDTH_DISTRIBUTION_START,
+      widthsDistribution: GreasedLineMesh.WIDTH_DISTRIBUTION_START,
       useColors: true,
       colors: colors1,
-      colorDistribution: GreasedLine.COLOR_DISTRIBUTION_Repeat,
+      colorDistribution: GreasedLineMesh.COLOR_DISTRIBUTION_Repeat,
     },
     scene
   );
@@ -53,8 +53,8 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       widths: cap1a.widths,
       useColors: true,
       colors: colorsCap1a,
-      widthsDistribution: GreasedLine.WIDTH_DISTRIBUTION_START,
-      colorDistribution: GreasedLine.COLOR_DISTRIBUTION_Repeat,
+      widthsDistribution: GreasedLineMesh.WIDTH_DISTRIBUTION_START,
+      colorDistribution: GreasedLineMesh.COLOR_DISTRIBUTION_Repeat,
     },
     scene
   );
@@ -68,8 +68,8 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       widths: cap1b.widths,
       useColors: true,
       colors: colorsCap1b,
-      widthsDistribution: GreasedLine.WIDTH_DISTRIBUTION_START,
-      colorDistribution: GreasedLine.COLOR_DISTRIBUTION_REPEAT,
+      widthsDistribution: GreasedLineMesh.WIDTH_DISTRIBUTION_START,
+      colorDistribution: GreasedLineMesh.COLOR_DISTRIBUTION_REPEAT,
     },
     scene
   );
@@ -85,10 +85,10 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     {
       points: points2,
       width: 80,
-      widthsDistribution: GreasedLine.WIDTH_DISTRIBUTION_START,
+      widthsDistribution: GreasedLineMesh.WIDTH_DISTRIBUTION_START,
       useColors: true,
       colors: colors2,
-      colorDistribution: GreasedLine.COLOR_DISTRIBUTION_REPEAT,
+      colorDistribution: GreasedLineMesh.COLOR_DISTRIBUTION_REPEAT,
     },
     scene
   );
@@ -102,8 +102,8 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       widths: cap2a.widths,
       useColors: true,
       colors: colorsCap2a,
-      widthsDistribution: GreasedLine.WIDTH_DISTRIBUTION_START,
-      colorDistribution: GreasedLine.COLOR_DISTRIBUTION_REPEAT,
+      widthsDistribution: GreasedLineMesh.WIDTH_DISTRIBUTION_START,
+      colorDistribution: GreasedLineMesh.COLOR_DISTRIBUTION_REPEAT,
     },
     scene
   );
@@ -116,8 +116,8 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       widths: cap2b.widths,
       useColors: true,
       colors: colorsCap2a,
-      widthsDistribution: GreasedLine.WIDTH_DISTRIBUTION_Start,
-      colorDistribution: GreasedLine.COLOR_DISTRIBUTION_Repeat,
+      widthsDistribution: GreasedLineMesh.WIDTH_DISTRIBUTION_Start,
+      colorDistribution: GreasedLineMesh.COLOR_DISTRIBUTION_Repeat,
     },
     scene
   );

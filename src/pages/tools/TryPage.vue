@@ -7,7 +7,7 @@ import { ArcRotateCamera, Color3, Scene, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { GreasedLinePBRMaterial } from 'src/greased-line/GreasedLinePBRMaterial';
 import { onMounted, ref } from 'vue';
-import { GreasedLineBuilder } from '../../greased-line/GraesedLineBuilder';
+import { GreasedLineBuilder } from '../../greased-line/graesedLineBuilder';
 
 const canvas = ref<HTMLCanvasElement | null>(null);
 onMounted(() => {

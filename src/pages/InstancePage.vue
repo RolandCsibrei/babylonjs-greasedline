@@ -4,12 +4,12 @@
 </template>
 
 <script setup lang="ts">
-import { ArcRotateCamera, Color3, Color4, Scalar, Scene, Vector3 } from '@babylonjs/core';
+import { ArcRotateCamera, Color3, Color4, Scalar, Scene, StandardMaterial, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
-import { GreasedLineBuilder } from '../greased-line/GraesedLineBuilder';
+import { GreasedLineBuilder } from '../greased-line/graesedLineBuilder';
 import CodeSnippets from 'src/components/CodeSnippets.vue';
-import { GreasedLine } from 'src/greased-line/GreasedLine';
+import { GreasedLineMesh } from 'src/greased-line/greasedLineMesh';
 
 const codeSnippets = [
   `  let instance: GreasedLine | undefined = undefined;
@@ -48,10 +48,11 @@ onMounted(() => {
 });
 
 const demo = (scene: Scene, camera: ArcRotateCamera) => {
-  let instance: GreasedLine | undefined = undefined;
+  let instance: GreasedLineMesh | undefined = undefined;
   for (let i = 0; i < 200; i++) {
     const points = [];
-    const colors = [Color3.Random()]
+    const color = Color3.Random()
+    const colors = [color, color]
     for (let j = 0; j < 2; j++) {
       const x = Scalar.RandomRange(-5, 5);
       const y = Scalar.RandomRange(-5, 5);
@@ -76,6 +77,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
   }
 
   if (instance) {
+    (instance.material as StandardMaterial).disableLighting = true
     camera.zoomOnFactor = 1.3;
     camera.zoomOn([instance]);
   }

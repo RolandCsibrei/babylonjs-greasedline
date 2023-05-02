@@ -4,14 +4,13 @@
 </template>
 
 <script setup lang="ts">
-import { ArcRotateCamera, Axis, Color3, CubeTexture, GlowLayer, Material, MeshBuilder, PointLight, Scalar, Scene, ShaderMaterial, Sprite, SpriteManager, StandardMaterial, Texture, Vector2, Vector3, VolumetricLightScatteringPostProcess } from '@babylonjs/core';
+import { ArcRotateCamera, Axis, Color3, CubeTexture, GlowLayer, Material, MeshBuilder, PBRMaterial, PointLight, Scalar, Scene, ShaderMaterial, Sprite, SpriteManager, StandardMaterial, Texture, Vector2, Vector3, VolumetricLightScatteringPostProcess } from '@babylonjs/core';
 import { FireProceduralTexture } from '@babylonjs/procedural-textures/fire';
 import { init } from 'src/babylon';
-import { GreasedLine, GreasedLinePoints } from 'src/greased-line/GreasedLine';
-import { GreasedLinePBRMaterial } from 'src/greased-line/GreasedLinePBRMaterial';
-import { circle } from 'src/greased-line/lineUtils';
+import { GreasedLineMesh, GreasedLinePoints } from 'src/greased-line/greasedLineMesh';
+import { circle } from 'src/greased-line/greasedLineTools';
 import { onMounted, ref } from 'vue';
-import { GreasedLineBuilder } from '../../greased-line/GraesedLineBuilder';
+import { GreasedLineBuilder } from '../../greased-line/graesedLineBuilder';
 import CodeSnippets from 'src/components/CodeSnippets.vue';
 
 const credits = [
@@ -19,8 +18,8 @@ const credits = [
 ]
 
 interface FlyingLine {
-  lineMesh: GreasedLine
-  material: GreasedLinePBRMaterial
+  lineMesh: GreasedLineMesh
+  material: PBRMaterial
   origin: Vector3
   direction: Vector3
   length: number
@@ -76,7 +75,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     const rotation = new Vector3(Math.random() * 2 * Math.PI, Math.random() * 2 * Math.PI, Math.random() * 2 * Math.PI)
     lineMesh.rotation = rotation
 
-    const material = lineMesh.material as GreasedLinePBRMaterial
+    const material = lineMesh.material as PBRMaterial
     material.backFaceCulling = false
     material.emissiveColor = new Color3(1, 1, 0)
 
@@ -114,7 +113,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
         l.lineMesh.rotate(Axis.Y, l.direction.y * l.speed * scene.getAnimationRatio())
         l.lineMesh.rotate(Axis.X, l.direction.x * l.speed * scene.getAnimationRatio())
 
-        l.material.setVisibility(l.visibility)
+        l.lineMesh.greasedLineMaterial.setVisibility(l.visibility)
 
         l.material.alpha = l.opacity
         l.material.alphaMode = Material.MATERIAL_ALPHABLEND
@@ -340,11 +339,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
   }
 
   function getPoints(diameter: number, length = 40) {
-    const points = []
-    const circlePoints = circle(diameter / 1.9, length, 0.05)
-    for (let i = 0; i < circlePoints.length; i += 3) {
-      points.push(new Vector3(circlePoints[i], circlePoints[i + 1], circlePoints[i + 2]))
-    }
+    const points = circle(diameter / 1.9, length, 0.05)
     return { points, cnt: points.length }
   }
 };

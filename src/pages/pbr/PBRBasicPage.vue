@@ -1,15 +1,14 @@
 <template>
   <canvas ref="canvas" class="canvas"></canvas>
-  <CodeSnippets :codeSnippets="codeSnippets" />
+  <!-- <CodeSnippets :codeSnippets="codeSnippets" /> -->
 </template>
 
 <script setup lang="ts">
-import { ArcRotateCamera, Color3, CubeTexture, Scene, Vector3 } from '@babylonjs/core';
+import { ArcRotateCamera, Color3, CubeTexture, PBRMaterial, Scene, Texture, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
-import { GreasedLineBuilder } from '../../greased-line/GraesedLineBuilder'
+import { GreasedLineBuilder } from '../../greased-line/graesedLineBuilder'
 import CodeSnippets from 'src/components/CodeSnippets.vue';
-import { GreasedLinePBRMaterial } from 'src/greased-line/GreasedLinePBRMaterial';
 
 const codeSnippets = [
   `  const points = []
@@ -74,14 +73,31 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
 
   // scene.createDefaultEnvironment()
 
-  const material = line1.material as GreasedLinePBRMaterial
-  const hdrTexture = new CubeTexture('/environments/environment.dds', scene);
-  material.reflectionTexture = hdrTexture
+  const material = line1.material as PBRMaterial
+  // const hdrTexture = new CubeTexture('/environments/environment.dds', scene);
+  // material.reflectionTexture = hdrTexture
 
+  // material.albedoColor = Color3.Random()
 
   // material.albedoColor = Color3.Random()
   // material.metallic = 0.8;
   // material.roughness = 0;
+
+
+  // const albedoTexture = new Texture('/textures/moon.jpg', scene)
+  // albedoTexture.vScale = 0.08
+  // albedoTexture.uScale = 4
+  // material.albedoTexture = albedoTexture
+
+  // const roughnessTexture = new Texture('/textures/moon_spec.jpg', scene)
+  // roughnessTexture.vScale = 0.08
+  // roughnessTexture.uScale = 4
+  // pbr.metallicTexture = roughnessTexture
+
+  const bumpTexture = new Texture('/textures/moon_bump.jpg', scene)
+  bumpTexture.vScale = 1
+  bumpTexture.uScale = 4
+  material.bumpTexture = bumpTexture
 
 
   camera.zoomOnFactor = 1.1

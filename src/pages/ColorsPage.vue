@@ -4,11 +4,12 @@
 </template>
 
 <script setup lang="ts">
-import { ArcRotateCamera, Color3, Scene, Vector3 } from '@babylonjs/core';
+import { ArcRotateCamera, Color3, Scene, StandardMaterial, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
-import { GreasedLineBuilder } from '../greased-line/GraesedLineBuilder'
+import { GreasedLineBuilder } from '../greased-line/graesedLineBuilder'
 import CodeSnippets from 'src/components/CodeSnippets.vue';
+import { GreasedLineMesh } from 'src/greased-line/greasedLineMesh';
 
 const codeSnippets = [
   `  // 3 points, 2 lines, 2 colors
@@ -75,15 +76,17 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     scene
   )
 
+  const mat = line1.material as StandardMaterial
+  mat.disableLighting = true
+  mat.emissiveColor = Color3.White()
+
+
   //
 
   const colors2 = [new Color3(0.5, 0.5, 0.5), new Color3(1, 1, 1)]
   const line2 = GreasedLineBuilder.CreateGreasedLine(
     'basic-line-2',
     {
-      color: Color3.Blue(),
-      colors: colors2,
-      useColors: true,
       width: 10,
       points: [
         new Vector3(0, -4, 0),
@@ -94,6 +97,10 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     scene
   )
 
+  const mat2 = line2.material as StandardMaterial
+  mat2.disableLighting = true
+  mat2.emissiveColor = Color3.Blue()
+
   //
   const points3 = []
   const colors3 = []
@@ -101,16 +108,23 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     points3.push(new Vector3(x, Math.cos(x / 2) - 8, 0))
     colors3.push(Color3.Random())
   }
+  debugger
   const line3 = GreasedLineBuilder.CreateGreasedLine(
     'basic-line-3',
     {
       colors: colors3,
       useColors: true,
       width: 10,
-      points: points3
+      points: points3,
+      unlit: true
     },
     scene
   )
+
+
+  const mat3 = line3.material as StandardMaterial
+  // mat3.disableLighting = true
+  mat3.emissiveColor = Color3.White()
 
   //
 

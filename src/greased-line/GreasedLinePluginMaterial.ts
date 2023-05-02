@@ -1,19 +1,15 @@
-/**
- * @author roland@babylonjs.xyz
- */
-
 import {
-  AbstractMesh,
+  Color3,
   Engine,
+  Nullable,
   RawTexture,
   Scene,
   StandardMaterial,
-  SubMesh,
 } from '@babylonjs/core';
 import { MaterialPluginBase, UniformBuffer } from '@babylonjs/core';
 import { Material } from '@babylonjs/core/Materials/material';
 import { Matrix } from '@babylonjs/core/Maths/math.vector';
-import { GreasedLineMaterialParameters } from './GraesedLineBuilder';
+import { GreasedLineMaterialParameters } from './graesedLineBuilder';
 
 export class GreasedLinePluginMaterial extends MaterialPluginBase {
   private _colorsTexture?: RawTexture;
@@ -27,22 +23,15 @@ export class GreasedLinePluginMaterial extends MaterialPluginBase {
 
     parameters: GreasedLineMaterialParameters
   ) {
-    super(material, 'GreasedLinePBRPluginMaterial', 200);
+    super(material, GreasedLinePluginMaterial.name, 200, {
+      GLINE_HAS_COLOR: false,
+      GLINE_HAS_COLORS: false,
+    });
 
     this._engine = this._scene.getEngine();
 
     if (parameters.colors) {
-      this._colorsTexture = new RawTexture(
-        new Uint8Array(parameters.colors),
-        parameters.colors.length / 3,
-        1,
-        Engine.TEXTUREFORMAT_RGB,
-        this._scene,
-        false,
-        true,
-        RawTexture.NEAREST_NEAREST
-      );
-      this._colorsTexture.name = 'greased-line-colors';
+      this._createColorsTexture(parameters.colors);
     }
 
     this._parameters = parameters;
@@ -70,7 +59,7 @@ export class GreasedLinePluginMaterial extends MaterialPluginBase {
         { name: 'worldViewProjection', size: 16, type: 'mat4' },
         { name: 'lineWidth', size: 1, type: 'float' },
         { name: 'resolution', size: 2, type: 'vec2' },
-        { name: 'color', size: 3, type: 'vec3' },
+        { name: 'singleColor', size: 3, type: 'vec3' },
         { name: 'sizeAttenuation', size: 1, type: 'float' },
         { name: 'dashArray', size: 1, type: 'float' },
         { name: 'dashOffset', size: 1, type: 'float' },
@@ -96,7 +85,7 @@ export class GreasedLinePluginMaterial extends MaterialPluginBase {
       uniform float colorsWidth;
       uniform float useColors;
       uniform sampler2D colors;
-      uniform vec3 color;
+      uniform vec3 singleColor;
       `,
     };
   }
@@ -116,9 +105,9 @@ export class GreasedLinePluginMaterial extends MaterialPluginBase {
 
   bindForSubMesh(
     uniformBuffer: UniformBuffer,
-    scene: Scene,
-    engine: Engine,
-    subMesh: SubMesh
+    scene: Scene
+    /*engine: Engine,
+    subMesh: SubMesh*/
   ) {
     if (this._isEnabled) {
       const activeCamera = this._scene.activeCamera;
@@ -152,10 +141,12 @@ export class GreasedLinePluginMaterial extends MaterialPluginBase {
           this._engine.getRenderHeight()
         );
       }
+
       uniformBuffer.updateFloat(
         'sizeAttenuation',
         GreasedLinePluginMaterial._bton(this._parameters.sizeAttenuation)
       );
+
       uniformBuffer.updateFloat('dashArray', this._parameters.dashArray ?? 0);
       uniformBuffer.updateFloat('dashOffset', this._parameters.dashOffset ?? 0);
       uniformBuffer.updateFloat('dashRatio', this._parameters.dashRatio ?? 0.5);
@@ -165,7 +156,7 @@ export class GreasedLinePluginMaterial extends MaterialPluginBase {
       );
 
       if (this._parameters.color) {
-        uniformBuffer.updateColor3('color', this._parameters.color);
+        uniformBuffer.updateColor3('singleColor', this._parameters.color);
       }
 
       if (this._colorsTexture) {
@@ -191,11 +182,11 @@ export class GreasedLinePluginMaterial extends MaterialPluginBase {
   ) {
     const parameters = this._parameters;
     defines['GLINE_HAS_COLOR'] = !!parameters.color;
-    defines['GLINE_HAS_COLORS'] = !!parameters.colors;
+    // defines['GLINE_HAS_COLORS'] = !!parameters.colors;
   }
 
   getClassName() {
-    return 'GreasedLinePBRPluginMaterial';
+    return GreasedLinePluginMaterial.name;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -218,22 +209,26 @@ export class GreasedLinePluginMaterial extends MaterialPluginBase {
     vec2 fix( vec4 i, float aspect ) {
       vec2 res = i.xy / i.w;
       res.x *= aspect;
+      vCounters = counters;
       return res;
   }
 `,
         CUSTOM_VERTEX_UPDATE_NORMAL: `
 `,
 
+        CUSTOM_VERTEX_UPDATE_POSITION: `
+    vec3 positionOffset = offsets;
+    positionUpdated += positionOffset;
+        `,
         CUSTOM_VERTEX_MAIN_END: `
-    vCounters = counters;
+    // vCounters = counters;
     vColorPointers = gl_VertexID;
     float aspect = resolution.x / resolution.y;
 
-    mat4 m = worldViewProjection;
-    vec3 positionOffset = offsets;
-    vec4 finalPosition = m * vec4( vPositionW + positionOffset, 1.0 );
-    vec4 prevPos = m * vec4( previous + positionOffset, 1.0 );
-    vec4 nextPos = m * vec4( next + positionOffset, 1.0 );
+    mat4 m = viewProjection * world;
+    vec4 finalPosition = m * vec4( positionUpdated , 1.0 );
+    vec4 prevPos = m * vec4( previous, 1.0 );
+    vec4 nextPos = m * vec4( next, 1.0 );
 
     vec2 currentP = fix( finalPosition, aspect );
     vec2 prevP = fix( prevPos, aspect );
@@ -263,20 +258,19 @@ export class GreasedLinePluginMaterial extends MaterialPluginBase {
 
     finalPosition.xy += normal.xy * side;
 
+
     gl_Position = finalPosition;
 
     vNormal= normal.xyz;
     vPositionW = vec3(finalPosition);
-
 `,
+        '!gl_Position\\=viewProjection\\*worldPos;': '//', // remove
       };
     }
 
     if (shaderType === 'fragment') {
       return {
         CUSTOM_FRAGMENT_DEFINITIONS: `
-
-          varying vec3 vNormal;
           varying float vCounters;
           flat in int vColorPointers;
     `,
@@ -292,31 +286,134 @@ export class GreasedLinePluginMaterial extends MaterialPluginBase {
             if(gl_FragColor.a == 0.) discard;
           }
 
-
-
-          if (useColors == 1.) {
-            // float x = vColorPointers % colorsWidth;
-            // float y = vColorPointers / colorsWidth;
-            // c *= texture2D(colors, vec2(x, y));
-            gl_FragColor ${
-              (this._material as StandardMaterial).disableLighting ? '' : '*'
-            }= texture2D(colors, vec2(float(vColorPointers)/(colorsWidth), 0.));
-            //
-            // gl_FragColor = texture2D(colors, vec2(0.5,0.));
-            // gl_FragColor = vec4(float(vColorPointers)/5.,0.,0.,1.);
-          }
-
           #ifdef GLINE_HAS_COLOR
-          gl_FragColor.rgb = color;
-        #endif
-    `,
+            gl_FragColor.rgb = singleColor;
+          #else
+            if (useColors == 1.) {
+              gl_FragColor *= texture2D(colors, vec2(float(vColorPointers)/(colorsWidth), 0.));
+            }
+          #endif
+      `,
       };
     }
 
     return null;
   }
 
+  /*
+              // float x = vColorPointers % colorsWidth;
+              // float y = vColorPointers / colorsWidth;
+              // c *= texture2D(colors, vec2(x, y));
+
+              gl_FragColor ${
+                (this._material as StandardMaterial).disableLighting ? '' : '*'
+              }= texture2D(colors, vec2(float(vColorPointers)/(colorsWidth), 0.));
+              //
+*/
+
   private static _bton(bool?: boolean) {
     return bool ? 1 : 0;
+  }
+
+  private _createColorsTexture(colors: Uint8Array) {
+    this._colorsTexture = new RawTexture(
+      colors,
+      colors.length / 3,
+      1,
+      Engine.TEXTUREFORMAT_RGB,
+      this._scene,
+      false,
+      true,
+      RawTexture.NEAREST_NEAREST
+    );
+    this._colorsTexture.name = 'greased-line-colors';
+  }
+
+  public setUseColors(value: boolean) {
+    this._parameters.useColors = value;
+  }
+
+  public setColors(
+    colors: Nullable<Uint8Array>,
+    lazy = false,
+    forceUpdate = false
+  ): void {
+    if (colors === null || colors.length === 0) {
+      this._colorsTexture?.dispose();
+      return;
+    }
+
+    const origColorsCount = this._parameters.colors?.length ?? 0;
+
+    this._parameters.colors = colors;
+
+    if (lazy && !forceUpdate) {
+      return;
+    }
+
+    if (
+      this._colorsTexture &&
+      origColorsCount === colors.length &&
+      !forceUpdate
+    ) {
+      this._colorsTexture.update(colors);
+    } else {
+      this._colorsTexture?.dispose();
+
+      // const colorsWidth = colors.length / 3;
+      // const colorsHeight = 1;
+
+      this._createColorsTexture(colors);
+    }
+  }
+
+  public updateLazy() {
+    if (this._parameters.colors) {
+      this.setColors(this._parameters.colors, false, true);
+    }
+  }
+
+  public getParameters() {
+    return { ...this._parameters };
+  }
+
+  public setVisibility(value: number) {
+    this._parameters.visibility = value;
+  }
+
+  public setUseDash(value: boolean) {
+    this._parameters.useDash = value;
+  }
+
+  public setDashArray(value: number) {
+    this._parameters.dashArray = value;
+  }
+
+  public setDashRatio(value: number) {
+    this._parameters.dashRatio = value;
+  }
+
+  public setDashOffset(value: number) {
+    this._parameters.dashOffset = value;
+  }
+
+  public setSizeAttenuation(value: boolean) {
+    this._parameters.sizeAttenuation = value;
+  }
+
+  public setWidth(value: number) {
+    this._parameters.width = value;
+  }
+
+  public setColor(value: Color3 | undefined) {
+    if (
+      (this._parameters.color === undefined && value !== undefined) ||
+      (this._parameters.color !== undefined && value === undefined)
+    ) {
+      this._parameters.color = value;
+      this.markAllDefinesAsDirty();
+    } else {
+      this._parameters.color = value;
+    }
   }
 }

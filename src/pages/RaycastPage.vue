@@ -7,10 +7,10 @@
 import { ArcRotateCamera, Color3, MeshBuilder, Ray, RayHelper, Scene, StandardMaterial, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
-import { GreasedLineBuilder } from '../greased-line/GraesedLineBuilder'
+import { GreasedLineBuilder } from '../greased-line/graesedLineBuilder'
 import CodeSnippets from 'src/components/CodeSnippets.vue';
-import { WidthsDistribution } from 'src/greased-line/GreasedLine';
-import { segmentize } from 'src/greased-line/lineUtils';
+import { WidthsDistribution } from 'src/greased-line/greasedLineMesh';
+import { segmentize } from 'src/greased-line/greasedLineTools';
 
 
 const codeSnippets = [

@@ -3,34 +3,53 @@
 </template>
 
 <script setup lang="ts">
-import { Analyser, ArcRotateCamera, Color3, Engine, RawTexture, Scene, Sound, Vector2, Vector3 } from '@babylonjs/core';
+import { Analyser, ArcRotateCamera, Axis, Color3, Engine, GlowLayer, MeshBuilder, MirrorTexture, Plane, RawTexture, Scene, Sound, StandardMaterial, Vector2, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
-import { GreasedLineMaterial } from 'src/greased-line/GreasedLineFastMaterialrial';
 import { onMounted, ref } from 'vue';
-import { GreasedLineBuilder } from '../../greased-line/GraesedLineBuilder'
+import { GreasedLineBuilder } from '../../greased-line/graesedLineBuilder'
+import { circle } from 'src/greased-line/greasedLineTools';
 
 const canvas = ref<HTMLCanvasElement | null>(null);
 onMounted(() => {
 
   if (canvas.value) {
-    const { scene, camera } = init(canvas.value, false, true)
+    const { scene, camera } = init(canvas.value, false, false)
     demo(scene, camera)
   }
 });
 
 const demo = (scene: Scene, camera: ArcRotateCamera) => {
-  const numOfBars = 256
   const barWidth = 3
 
-  const analyzerPoints = []
+  const numOfBars = 99
+  const circularAnalyzerPoints = circle(140, numOfBars * 2);
+
   const offsets: number[] = []
-  for (let i = 0; i < numOfBars; i++) {
-    analyzerPoints.push(new Vector3(i * barWidth, 0, 0))
+  for (let i = 0; i < circularAnalyzerPoints.length; i++) {
     offsets.push(0, 0, 0, 0, 0, 0)
   }
-  const wavePoints = [...analyzerPoints]
 
-  const textureColors = new Uint8Array([255, 0, 0, 255, 255, 0, 0, 255, 0])
+  const circularAnalyzerLine = GreasedLineBuilder.CreateGreasedLine(
+    'circular-analyzer-line',
+    {
+      points: circularAnalyzerPoints,
+      offsets,
+      width: 40,
+      updatable: true,
+      useDash: true,
+      dashArray: 1 / (numOfBars * 2), // 1 / (num of dashes * 2)
+      dashRatio: 0.4, // dash length ratio 0..1 (0.1 = 10% empty, 90% drawn),
+    },
+    scene,
+  )
+  // circularAnalyzerLine.position.x += 300
+
+  const textureColors = new Uint8Array([
+    0, 240, 232,
+    236, 0, 242,
+    0, 240, 232,
+    0, 37, 245,
+  ])
   const texture = new RawTexture(
     textureColors,
     textureColors.length / 3,
@@ -39,52 +58,40 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     scene,
     false,
     true,
-    Engine.TEXTURE_LINEAR_NEAREST
+    Engine.TEXTURE_LINEAR_LINEAR
   )
   texture.wrapU = RawTexture.WRAP_ADDRESSMODE
   texture.name = 'analyzer-texture'
+  texture.uOffset = 1.4
 
-  const analyzerLine = GreasedLineBuilder.CreateGreasedLine(
-    'analyzer-line',
-    {
-      points: analyzerPoints,
-      useMap: true,
-      map: texture,
-      width: 14,
-      updatable: true
-    },
-    scene,
-  )
+  let material = circularAnalyzerLine.material as StandardMaterial
+  material.emissiveTexture = texture
 
-  const waveLine = GreasedLineBuilder.CreateGreasedLine(
-    'wave-line',
-    {
-      points: wavePoints,
-      offsets,
-      color: Color3.Red(),
-      sizeAttenuation: true,
-      width: 24,
-      dashArray: 1 / numOfBars,
-      dashRatio: 0.4,
-      useDash: true,
-      updatable: true
-    },
-    scene,
-  )
-  waveLine.position = new Vector3(0, -30, 0)
+
 
   //
 
-  camera.zoomOn([analyzerLine])
-  camera.radius = 530
-  camera.detachControl()
+  camera.zoomOn([circularAnalyzerLine])
+  // camera.radius = 1530
+  // camera.detachControl()
 
-  _drawGrid()
+
+
+  const glow = new GlowLayer('glow', scene, {
+  })
+  glow.intensity = 0.8;
+  glow.blurKernelSize = 128
+
+
+  glow.referenceMeshToUseItsOwnMaterial(circularAnalyzerLine)
+  glow.addIncludedOnlyMesh(circularAnalyzerLine)
+
+
   _startAudio()
   _createAnalyzer()
 
   function _startAudio() {
-    const music = new Sound('Music', '/mp3/glitch-flight-track.mp3', scene, null, {
+    const music = new Sound('Music', '/mp3/Alan_Walker_-_Faded.mp3', scene, null, {
       loop: true,
       autoplay: true,
     })
@@ -113,27 +120,36 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       Engine.audioEngine.connectToAnalyser(analyser)
       analyser.BARGRAPHAMPLITUDE = 256
       analyser.FFT_SIZE = 512
-      analyser.SMOOTHING = 0.7
+      analyser.SMOOTHING = 0.8
 
       const uvOffset = new Vector2(0, 0)
-
-      const analyzerMaterial = analyzerLine.material as GreasedLineMaterial
       scene.onBeforeRenderObservable.add(() => {
         const frequencies = analyser.getByteFrequencyData()
         const widths = []
         const offsets = []
         for (let i = 0; i < numOfBars; i++) {
-          const normalizedFrequency = frequencies[i]
-          widths.push(normalizedFrequency, normalizedFrequency / 2)
-          offsets.push(0, -normalizedFrequency, 0, 0, -normalizedFrequency, 0)
-        }
-        analyzerLine.setSegmentWidths(widths)
-        waveLine.setOffsets(offsets)
+          const f = frequencies[i]
+          const normalizedFrequency = Math.pow(f / 20, 3) / 2
+          widths.push(normalizedFrequency / 20, normalizedFrequency / 40)
+          offsets.push(0, 0, -normalizedFrequency, 0, 0, -normalizedFrequency, 0)
 
-        analyzerMaterial.setUvOffset(
-          uvOffset,
-        )
-        uvOffset.x += 0.01 * scene.getAnimationRatio()
+        }
+
+        for (let i = numOfBars; i >= 0; i--) {
+          const f = frequencies[i]
+          const normalizedFrequency = Math.pow(f / 20, 3) / 2
+          widths.push(normalizedFrequency / 22, normalizedFrequency / 42)
+          offsets.push(0, 0, -normalizedFrequency, 0, 0, -normalizedFrequency, 0)
+        }
+
+        circularAnalyzerLine.setSegmentWidths(widths)
+        // circularAnalyzerLine.setOffsets(offsets)
+        circularAnalyzerLine.rotate(Axis.Z, 0.01 * scene.getAnimationRatio())
+
+
+        // texture.uOffset = uvOffset.x
+        // uvOffset.x += 0.002 * scene.getAnimationRatio()
+        // console.log(uvOffset.x)
       })
     } else {
       console.error('No audio engine.')

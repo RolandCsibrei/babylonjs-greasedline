@@ -6,10 +6,9 @@
 <script setup lang="ts">
 import { ArcRotateCamera, Color3, CubeTexture, GlowLayer, KeyboardEventTypes, MeshBuilder, Scalar, Scene, StandardMaterial, Texture, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
-import { GreasedLine } from 'src/greased-line/GreasedLine';
-import { GreasedLineMaterial } from 'src/greased-line/GreasedLineFastMaterialrial';
+import { GreasedLineMesh } from 'src/greased-line/greasedLineMesh';
 import { onMounted, ref } from 'vue';
-import { GreasedLineBuilder } from '../../greased-line/GraesedLineBuilder';
+import { GreasedLineBuilder } from '../../greased-line/graesedLineBuilder';
 import CodeSnippets from 'src/components/CodeSnippets.vue';
 
 
@@ -60,7 +59,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
 
   // const line1 = []
   const ratio = 16 / 9;
-  let mesh: GreasedLine | undefined = undefined;
+  let mesh: GreasedLineMesh | undefined = undefined;
   for (let i = 0; i < count; i++) {
     const radius = Scalar.RandomRange(minRadius, maxRadius);
     const a = Scalar.RandomRange(0, Math.PI * 2);
@@ -135,7 +134,6 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     glow.referenceMeshToUseItsOwnMaterial(mesh);
 
     scene.autoClear = false;
-    const mat = mesh.material as GreasedLineMaterial;
 
     let visibility = 0.05;
 
@@ -159,12 +157,12 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       if (mesh) {
         mesh.scaling = scale;
         mesh.setSegmentWidths(segmentWidths);
+        mesh.setVisibility(visibility);
       }
 
       glow.intensity *= 1.00005;
 
       // glow.intensity = 1 / (camera.radius / 80)
-      mat.setVisibility(visibility);
 
       visibility += 0.001 * scene.getAnimationRatio();
       if (visibility > 1) {

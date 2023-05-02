@@ -8,7 +8,7 @@ import { ArcRotateCamera, Color3, GlowLayer, Scene, SceneLoader, Vector3, Vertex
 import { init } from 'src/babylon';
 import CodeSnippets from 'src/components/CodeSnippets.vue';
 import { onMounted, ref } from 'vue';
-import { GreasedLineBuilder } from '../../greased-line/GraesedLineBuilder'
+import { GreasedLineBuilder } from '../../greased-line/graesedLineBuilder'
 
 const credits = [
   `3D model by my friend Krystof Klestil
@@ -19,7 +19,7 @@ const canvas = ref<HTMLCanvasElement | null>(null);
 onMounted(async () => {
 
   if (canvas.value) {
-    const { scene, camera } = init(canvas.value, false, true)
+    const { scene, camera } = init(canvas.value, false, false)
     await demo(scene, camera)
   }
 });
@@ -32,7 +32,7 @@ const demo = async (scene: Scene, camera: ArcRotateCamera) => {
   glow.intensity = 1.2;
 
 
-  const loaded = await SceneLoader.AppendAsync(
+  const loaded = await SceneLoader.ImportMeshAsync(null,
     '/models/',
     'Fordt_GT_go_crazy-lines.glb'
   );

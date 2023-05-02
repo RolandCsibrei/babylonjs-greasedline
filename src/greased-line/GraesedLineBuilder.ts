@@ -1,4 +1,3 @@
-import { CubeTexture, MeshBuilder, StandardMaterial } from '@babylonjs/core';
 /**
  * @author roland@babylonjs.xyz
  */
@@ -10,42 +9,41 @@ import {
   Nullable,
   PBRMaterial,
   RawTexture,
-  RegisterMaterialPlugin,
+  StandardMaterial,
   Scene,
   Texture,
   Vector2,
   Vector3,
 } from '@babylonjs/core';
 
-import { GreasedLinePluginMaterial } from './GreasedLinePluginMaterial';
+import { GreasedLinePluginMaterial } from './greasedLinePluginMaterial';
 import {
-  GreasedLine,
+  GreasedLineMesh,
   GreasedLineParameters,
   GreasedLinePoints,
-} from './GreasedLine';
+} from './greasedLineMesh';
 
-import {
-  GreasedLineSimpleMaterial,
-  GreasedLineSimpleMaterialParameters,
-} from './GreasedLineSimpleMaterial';
+import { GreasedLineSimpleMaterial } from './greasedLineSimpleMaterial';
 
-const COLOR_DISTRIBUTION_NONE = 0;
-const COLOR_DISTRIBUTION_REPEAT = 1;
-const COLOR_DISTRIBUTION_EVEN = 2;
-const COLOR_DISTRIBUTION_START = 3;
-const COLOR_DISTRIBUTION_END = 4;
-const COLOR_DISTRIBUTION_START_END = 5;
+const COLOR_DISTRIBUTION_NONE = GreasedLineMesh.COLOR_DISTRIBUTION_NONE;
+const COLOR_DISTRIBUTION_REPEAT = GreasedLineMesh.COLOR_DISTRIBUTION_REPEAT;
+const COLOR_DISTRIBUTION_EVEN = GreasedLineMesh.COLOR_DISTRIBUTION_EVEN;
+const COLOR_DISTRIBUTION_START = GreasedLineMesh.COLOR_DISTRIBUTION_START;
+const COLOR_DISTRIBUTION_END = GreasedLineMesh.COLOR_DISTRIBUTION_END;
+const COLOR_DISTRIBUTION_START_END =
+  GreasedLineMesh.COLOR_DISTRIBUTION_START_END;
 
-const WIDTH_DISTRIBUTION_NONE = 0;
-const WIDTH_DISTRIBUTION_REPEAT = 1;
-const WIDTH_DISTRIBUTION_EVEN = 2;
-const WIDTH_DISTRIBUTION_START = 3;
-const WIDTH_DISTRIBUTION_END = 4;
-const WIDTH_DISTRIBUTION_START_END = 5;
+const WIDTH_DISTRIBUTION_NONE = GreasedLineMesh.WIDTH_DISTRIBUTION_NONE;
+const WIDTH_DISTRIBUTION_REPEAT = GreasedLineMesh.WIDTH_DISTRIBUTION_REPEAT;
+const WIDTH_DISTRIBUTION_EVEN = GreasedLineMesh.WIDTH_DISTRIBUTION_EVEN;
+const WIDTH_DISTRIBUTION_START = GreasedLineMesh.WIDTH_DISTRIBUTION_START;
+const WIDTH_DISTRIBUTION_END = GreasedLineMesh.WIDTH_DISTRIBUTION_END;
+const WIDTH_DISTRIBUTION_START_END =
+  GreasedLineMesh.WIDTH_DISTRIBUTION_START_END;
 
-const MATERIAL_TYPE_SIMPLE = 0;
-const MATERIAL_TYPE_STANDARD = 1;
-const MATERIAL_TYPE_PBR = 2;
+const MATERIAL_TYPE_SIMPLE = GreasedLineMesh.MATERIAL_TYPE_SIMPLE;
+const MATERIAL_TYPE_STANDARD = GreasedLineMesh.MATERIAL_TYPE_STANDARD;
+const MATERIAL_TYPE_PBR = GreasedLineMesh.MATERIAL_TYPE_PBR;
 
 export interface GreasedLineMaterialParameters {
   lazy?: boolean;
@@ -73,9 +71,11 @@ export interface GreasedLineBuilderParameters {
   widths?: number[];
   widthsDistribution?: number;
   offsets?: number[];
-  instance?: GreasedLine;
+  instance?: GreasedLineMesh;
   updatable?: boolean;
   pbr?: boolean;
+
+  unlit?: boolean;
 
   //
 
@@ -144,7 +144,6 @@ export function CreateGreasedLine(
   scene = <Scene>(scene ?? EngineStore.LastCreatedScene);
 
   let instance;
-
   const allPoints = GreasedLineBuilder.ConvertPoints(parameters.points);
   let length = 0;
   if (Array.isArray(allPoints[0])) {
@@ -158,28 +157,6 @@ export function CreateGreasedLine(
     parameters.widthsDistribution ?? WIDTH_DISTRIBUTION_START
   );
 
-  if (!parameters.instance) {
-    const initialGreasedLineParameters: GreasedLineParameters = {
-      points: allPoints,
-      offsets: parameters.offsets,
-      pbr: parameters.pbr,
-      updatable: parameters.updatable,
-      widths,
-      widthsDistribution: parameters.widthsDistribution,
-    };
-    instance = new GreasedLine(
-      name,
-      scene,
-      initialGreasedLineParameters,
-      parameters.updatable,
-      parameters.lazy
-    );
-  } else {
-    instance = parameters.instance;
-    _SetSegmentWidths(instance, widths);
-    instance.addPoints(allPoints);
-  }
-
   const colors = parameters.colors
     ? GreasedLineBuilder.NormalizeColorTable(
         length,
@@ -189,40 +166,67 @@ export function CreateGreasedLine(
       )
     : undefined;
 
-  if (!instance.material) {
+  if (!parameters.instance) {
+    const initialGreasedLineParameters: GreasedLineParameters = {
+      points: allPoints,
+      offsets: parameters.offsets,
+      pbr: parameters.pbr,
+      updatable: parameters.updatable,
+      widths,
+      widthsDistribution: parameters.widthsDistribution,
+    };
+
     const initialMaterialParameters: GreasedLineMaterialParameters = {
       colorDistribution: parameters.colorDistribution,
       dashArray: parameters.dashArray,
       dashOffset: parameters.dashOffset,
       dashRatio: parameters.dashRatio,
       resolution: parameters.resolution,
-      sizeAttenuation: parameters.sizeAttenuation === undefined ? false : true,
+      sizeAttenuation: parameters.sizeAttenuation,
       useColors: parameters.useColors,
       useDash: parameters.useDash,
       visibility: parameters.visibility,
       width: parameters.width,
+      color: parameters.color,
     };
+
     if (colors) {
       initialMaterialParameters.colors =
         GreasedLineBuilder.Color3toUint8(colors);
     }
+
     const material = parameters.pbr
       ? new PBRMaterial(name, scene)
       : new StandardMaterial(name, scene);
+
+    if (parameters.unlit === true) {
+      material.disableLighting = true;
+      debugger;
+    }
 
     const plugin = new GreasedLinePluginMaterial(
       material,
       scene,
       initialMaterialParameters
     );
-    // const mesh = MeshBuilder.CreateSphere('mesh', { diameter: 4 }, scene);
-    // mesh.material = material;
-    // mesh.convertToFlatShadedMesh();
+
+    instance = new GreasedLineMesh(
+      name,
+      scene,
+      initialGreasedLineParameters,
+      plugin,
+      parameters.updatable,
+      parameters.lazy
+    );
     instance.material = material;
   } else {
-    if (colors) {
-      _SetColors(instance, colors);
-    }
+    instance = parameters.instance;
+    _SetSegmentWidths(instance, widths);
+    instance.addPoints(allPoints);
+  }
+
+  if (colors) {
+    _SetColors(instance, colors);
   }
 
   return instance;
@@ -274,6 +278,154 @@ export function ConvertPoints(points: GreasedLinePoints): number[][] {
   }
 
   return [];
+}
+
+export function NormalizeWidthTableDistributionStartEnd(
+  pointCount: number,
+  widths: number[],
+  defaultWidthUp = 1,
+  defaultWidthDown = 1
+) {
+  // is the color table is shorter the the point table?
+  const missingCount = pointCount - widths.length / 2;
+
+  const widthsData: number[] = [];
+  if (missingCount <= 0) {
+    return widths.slice(0, pointCount * 2);
+  }
+
+  const halfCount = Math.floor(widths.length / 2);
+
+  // start sector
+  for (let i = 0, j = 0; i < halfCount - 1; i++) {
+    widthsData.push(widths[j++]);
+    widthsData.push(widths[j++]);
+  }
+
+  // middle sector
+  // const widthL = widths[halfCount / 2];
+  // const widthU = widths[halfCount / 2 + 1];
+  for (let i = 0; i < missingCount; i++) {
+    widthsData.push(defaultWidthUp);
+    widthsData.push(defaultWidthDown);
+  }
+
+  // end sector
+  for (let i = halfCount; i < widths.length; i += 2) {
+    widthsData.push(widths[i]);
+    widthsData.push(widths[i + 1]);
+  }
+
+  return widthsData;
+}
+
+export function NormalizeWidthTableDistributionStart(
+  pointCount: number,
+  widths: number[],
+  defaultWidthUp = 1,
+  defaultWidthDown = 1
+) {
+  // is the color table is shorter the the point table?
+  const missingCount = pointCount - widths.length / 2;
+
+  const widthsData: number[] = [];
+  if (missingCount <= 0) {
+    return widths.slice(0, pointCount * 2);
+  }
+
+  // start sector
+  for (let i = 0; i < widths.length; i += 2) {
+    widthsData.push(widths[i]);
+    widthsData.push(widths[i + 1]);
+  }
+
+  // end sector
+  for (let i = 0; i < missingCount; i++) {
+    widthsData.push(defaultWidthUp);
+    widthsData.push(defaultWidthDown);
+  }
+
+  return widthsData;
+}
+
+export function NormalizeWidthTableDistributionEnd(
+  pointCount: number,
+  widths: number[],
+  defaultWidthUp = 1,
+  defaultWidthDown = 1
+) {
+  // is the color table is shorter the the point table?
+  const missingCount = pointCount - widths.length / 2;
+
+  const widthsData: number[] = [];
+  if (missingCount <= 0) {
+    return widths.slice(0, pointCount * 2);
+  }
+
+  // start sector
+  for (let i = 0; i < missingCount; i++) {
+    widthsData.push(defaultWidthUp);
+    widthsData.push(defaultWidthDown);
+  }
+
+  // end sector
+  for (let i = 0; i < widths.length; i += 2) {
+    widthsData.push(widths[i]);
+    widthsData.push(widths[i + 1]);
+  }
+
+  return widthsData;
+}
+
+export function NormalizeWidthTableDistributionRepeat(
+  pointCount: number,
+  widths: number[]
+) {
+  // is the color table is shorter the the point table?
+  const missingCount = pointCount - widths.length / 2;
+
+  const widthsData: number[] = [];
+  if (missingCount <= 0) {
+    return widths.slice(0, pointCount * 2);
+  }
+
+  let i = 0;
+  for (let x = 0; x < pointCount; x++) {
+    widthsData.push(widths[i++]);
+    widthsData.push(widths[i++]);
+
+    // TODO: with %
+    if (i === widths.length) {
+      i = 0;
+    }
+  }
+  return widthsData;
+}
+
+export function NormalizeWidthTableDistributionEven(
+  pointCount: number,
+  widths: number[]
+) {
+  // is the color table is shorter the the point table?
+  const missingCount = pointCount - widths.length / 2;
+
+  const widthsData: number[] = [];
+  if (missingCount <= 0) {
+    return widths.slice(0, pointCount * 2);
+  }
+
+  let j = 0;
+  const widthsectorLength = widths.length / ((pointCount - 1) * 2);
+  for (let x = 0; x < pointCount; x++) {
+    const i = Math.floor(j);
+
+    widthsData.push(widths[i]);
+    widthsData.push(widths[i + 1]);
+
+    j += widthsectorLength;
+  }
+
+  return widthsData;
 }
 
 export function NormalizeWidthTable(
@@ -369,6 +521,217 @@ export function NormalizeWidthTable(
   }
 
   return widthsData;
+}
+
+export function NormalizeColorTableDistributionStartEnd(
+  pointCount: number,
+  colors: Color3[],
+  defaultColor: Color3 = Color3.White()
+) {
+  // is the color table is shorter the the point table?
+  const missingCount = pointCount - colors.length;
+
+  if (missingCount < 0) {
+    return colors.slice(0, pointCount);
+  }
+
+  const colorsData: Color3[] = [];
+
+  if (missingCount === 0) {
+    for (let i = 0; i < pointCount - 1; i++) {
+      colorsData.push(colors[i]);
+      colorsData.push(colors[i]);
+    }
+    return colorsData;
+  }
+
+  const halfCount = Math.floor(colors.length / 2);
+
+  // start sector
+  for (let i = 0; i < halfCount; i++) {
+    colorsData.push(colors[i]);
+    colorsData.push(colors[i]);
+  }
+
+  // middle sector
+  for (let i = 0; i < missingCount - 1; i++) {
+    colorsData.push(defaultColor);
+    colorsData.push(defaultColor);
+  }
+
+  // end sector
+  for (let i = halfCount; i < colors.length; i++) {
+    colorsData.push(colors[i]);
+    colorsData.push(colors[i]);
+  }
+
+  return colorsData;
+}
+
+export function NormalizeColorTableDistributionStart(
+  pointCount: number,
+  colors: Color3[],
+  defaultColor: Color3 = Color3.White()
+) {
+  // is the color table is shorter the the point table?
+  const missingCount = pointCount - colors.length;
+
+  if (missingCount < 0) {
+    return colors.slice(0, pointCount);
+  }
+
+  const colorsData: Color3[] = [];
+
+  if (missingCount === 0) {
+    for (let i = 0; i < pointCount - 1; i++) {
+      colorsData.push(colors[i]);
+      colorsData.push(colors[i]);
+    }
+    return colorsData;
+  }
+  // start sector
+  for (let i = 0; i < colors.length; i++) {
+    colorsData.push(colors[i]);
+    colorsData.push(colors[i]);
+  }
+
+  // end sector
+  for (let i = 0; i < missingCount; i++) {
+    colorsData.push(defaultColor);
+    colorsData.push(defaultColor);
+  }
+
+  return colorsData;
+}
+
+export function NormalizeColorTableDistributionEnd(
+  pointCount: number,
+  colors: Color3[],
+  defaultColor: Color3 = Color3.White()
+) {
+  // is the color table is shorter the the point table?
+  const missingCount = pointCount - colors.length;
+
+  if (missingCount < 0) {
+    return colors.slice(0, pointCount);
+  }
+
+  const colorsData: Color3[] = [];
+
+  if (missingCount === 0) {
+    for (let i = 0; i < pointCount - 1; i++) {
+      colorsData.push(colors[i]);
+      colorsData.push(colors[i]);
+    }
+    return colorsData;
+  }
+
+  // start sector
+  for (let i = 0; i < missingCount - 1; i++) {
+    colorsData.push(defaultColor);
+    colorsData.push(defaultColor);
+  }
+
+  // end sector
+  for (let i = 0; i < colors.length; i++) {
+    colorsData.push(colors[i]);
+    colorsData.push(colors[i]);
+  }
+
+  return colorsData;
+}
+
+export function NormalizeColorTableDistributionRepeat(
+  pointCount: number,
+  colors: Color3[]
+) {
+  // is the color table is shorter the the point table?
+  const missingCount = pointCount - colors.length;
+
+  if (missingCount < 0) {
+    return colors.slice(0, pointCount);
+  }
+
+  const colorsData: Color3[] = [];
+
+  if (missingCount === 0) {
+    for (let i = 0; i < pointCount - 1; i++) {
+      colorsData.push(colors[i]);
+      colorsData.push(colors[i]);
+    }
+    return colorsData;
+  }
+
+  let i = 0;
+  for (let x = 0; x < pointCount; x++) {
+    colorsData.push(colors[i]);
+    colorsData.push(colors[i]);
+
+    // TODO: with %
+    i++;
+
+    if (i === colors.length) {
+      i = 0;
+    }
+  }
+
+  return colorsData;
+}
+
+export function NormalizeColorTableDistributionEven(
+  pointCount: number,
+  colors: Color3[]
+) {
+  // is the color table is shorter the the point table?
+  const missingCount = pointCount - colors.length;
+
+  if (missingCount < 0) {
+    return colors.slice(0, pointCount);
+  }
+
+  const colorsData: Color3[] = [];
+
+  if (missingCount === 0) {
+    for (let i = 0; i < pointCount - 1; i++) {
+      colorsData.push(colors[i]);
+      colorsData.push(colors[i]);
+    }
+    return colorsData;
+  }
+
+  let j = 0;
+  const colorSectorLength = colors.length / (pointCount - 1);
+  for (let x = 0; x < pointCount - 1; x++) {
+    const i = Math.floor(j);
+
+    colorsData.push(colors[i]);
+    colorsData.push(colors[i]);
+
+    j += colorSectorLength;
+  }
+
+  return colorsData;
+}
+
+export function NormalizeColorTableDistributionNone(
+  pointCount: number,
+  colors: Color3[]
+) {
+  // is the color table is shorter the the point table?
+  const missingCount = pointCount - colors.length;
+
+  if (missingCount < 0) {
+    return colors.slice(0, pointCount);
+  }
+
+  const colorsData: Color3[] = [];
+
+  for (let i = 0; i < colors.length; i++) {
+    colorsData.push(colors[i]);
+    colorsData.push(colors[i]);
+  }
+
+  return colorsData;
 }
 
 export function NormalizeColorTable(
@@ -491,25 +854,54 @@ export function TextureFromColors(
   return colorsTexture;
 }
 
-function _SetColors(instance: GreasedLine, colors: Color3[]) {
-  if (instance.material instanceof GreasedLineSimpleMaterial) {
+function _SetColors(instance: GreasedLineMesh, colors: Color3[]) {
+  if (
+    instance.material instanceof StandardMaterial ||
+    instance.material instanceof PBRMaterial
+  ) {
+    if (instance.greasedLineMaterial) {
+      const currentColors = instance.greasedLineMaterial.getParameters().colors;
+      if (currentColors) {
+        const colorsUint8 = GreasedLineBuilder.Color3toUint8(colors);
+        const newColors = _appendColorsToExistingColors(
+          currentColors,
+          colorsUint8
+        );
+        instance.greasedLineMaterial.setColors(newColors, instance.isLazy());
+      }
+    }
+  } else if (instance.material instanceof GreasedLineSimpleMaterial) {
     const currentColors = instance.material.getParameters().colors;
-    const colorsUint8 = GreasedLineBuilder.Color3toUint8(colors);
-
     if (currentColors) {
-      const tmp = new Uint8Array(
-        currentColors.byteLength + colorsUint8.byteLength
+      const colorsUint8 = GreasedLineBuilder.Color3toUint8(colors);
+      const newColors = _appendColorsToExistingColors(
+        currentColors,
+        colorsUint8
       );
-      tmp.set(new Uint8Array(currentColors), 0);
-      tmp.set(new Uint8Array(colorsUint8), currentColors.byteLength);
-      instance.material.setColors(tmp, instance.isLazy());
-    } else {
-      instance.material.setColors(colorsUint8, instance.isLazy());
+      instance.material.setColors(newColors, instance.isLazy());
     }
   }
+
+  //   instance.material.setColors(newColors, instance.isLazy());
+  // } else {
+  //   instance.material.setColors(colorsUint8, instance.isLazy());
+  // }
+  // }
 }
 
-function _SetSegmentWidths(instance: GreasedLine, segmentWidths: number[]) {
+function _appendColorsToExistingColors(
+  existingColors: Uint8Array,
+  colorsToAppend: Uint8Array
+) {
+  const tmp = new Uint8Array(
+    existingColors.byteLength + colorsToAppend.byteLength
+  );
+  tmp.set(new Uint8Array(existingColors), 0);
+  tmp.set(new Uint8Array(colorsToAppend), existingColors.byteLength);
+  return tmp;
+}
+
+function _SetSegmentWidths(instance: GreasedLineMesh, segmentWidths: number[]) {
   const currentWidths = instance.getSegmentWidths();
 
   if (currentWidths) {

@@ -7,9 +7,9 @@
 import { ArcRotateCamera, Color3, Color4, Scene, Texture, Vector2, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
-import { ColorDistribution, GreasedLineBuilder } from '../greased-line/GraesedLineBuilder'
+import { ColorDistribution, GreasedLineBuilder } from '../greased-line/graesedLineBuilder'
 import CodeSnippets from 'src/components/CodeSnippets.vue';
-import { segmentize } from 'src/greased-line/lineUtils';
+import { segmentize } from 'src/greased-line/greasedLineTools';
 
 const codeSnippets = [
   `  const points1 = segmentize(

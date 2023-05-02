@@ -1,7 +1,3 @@
-/**
- * @author roland@babylonjs.xyz
- */
-
 import {
   ShaderMaterial,
   Scene,

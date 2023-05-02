@@ -7,9 +7,9 @@
 import { ArcRotateCamera, Color3, Color4, Scalar, Scene, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
-import { GreasedLineBuilder } from '../greased-line/GraesedLineBuilder'
+import { GreasedLineBuilder } from '../greased-line/graesedLineBuilder'
 import CodeSnippets from 'src/components/CodeSnippets.vue';
-import { GreasedLine } from 'src/greased-line/GreasedLine';
+import { GreasedLineMesh } from 'src/greased-line/greasedLineMesh';
 
 const codeSnippets = [
   `  const points1 = []
@@ -75,8 +75,9 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       useColors: true,
       widths: widths1,
       width: 40,
-      widthsDistribution: GreasedLine.WIDTH_DISTRIBUTION_START,
-      colorDistribution: GreasedLine.COLOR_DISTRIBUTION_REPEAT
+      widthsDistribution: GreasedLineMesh.WIDTH_DISTRIBUTION_START,
+      colorDistribution: GreasedLineMesh.COLOR_DISTRIBUTION_REPEAT,
+      unlit: true // TODO: this unlits all lines! WTF?
     },
     scene
   )
@@ -102,7 +103,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       colors: colors2,
       useColors: true,
       width: 40,
-      widthsDistribution: GreasedLine.WIDTH_DISTRIBUTION_END
+      widthsDistribution: GreasedLineMesh.WIDTH_DISTRIBUTION_END
     },
     scene
   )

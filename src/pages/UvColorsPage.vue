@@ -7,11 +7,8 @@
 import { ArcRotateCamera, Color3, Color4, Scene, Texture, Vector2, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
-import { ColorDistribution, ColorSamplingMode, GreasedLineBuilder } from '../greased-line/GraesedLineBuilder'
+import { GreasedLineBuilder } from '../greased-line/graesedLineBuilder'
 import CodeSnippets from 'src/components/CodeSnippets.vue';
-import { WidthsDistribution } from 'src/greased-line/GreasedLine';
-import { GreasedLineMaterial } from 'src/greased-line/GreasedLineFastMaterialrial';
-import { segmentize } from 'src/greased-line/lineUtils';
 
 const codeSnippets = [
   `  const colorMap1 = GreasedLineBuilder.TextureFromColors(
@@ -112,12 +109,12 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     scene
   );
 
-  const uvOffset = new Vector2(0, 0);
-  const mat = line1.material as GreasedLineMaterial;
-  scene.onBeforeRenderObservable.add(() => {
-    mat.setUvOffset(uvOffset);
-    uvOffset.x += 0.001 * scene.getAnimationRatio();
-  });
+  // const uvOffset = new Vector2(0, 0);
+  // const mat = line1.material as GreasedLineMaterial;
+  // scene.onBeforeRenderObservable.add(() => {
+  //   mat.setUvOffset(uvOffset);
+  //   uvOffset.x += 0.001 * scene.getAnimationRatio();
+  // });
 
 
   camera.zoomOnFactor = 1.3
