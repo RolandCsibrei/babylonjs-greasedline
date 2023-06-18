@@ -46,6 +46,10 @@ export class GreasedLineMesh extends Mesh {
   public static readonly MATERIAL_TYPE_STANDARD = 1;
   public static readonly MATERIAL_TYPE_PBR = 2;
 
+  public static readonly COLOR_MODE_SET = 0;
+  public static readonly COLOR_MODE_ADD = 1;
+  public static readonly COLOR_MODE_MULTIPLY = 2;
+
   private _vertexPositions: number[];
   private _offset?: number[];
   private _previous: number[];

@@ -1,15 +1,9 @@
-import {
-  Color3,
-  Engine,
-  Nullable,
-  RawTexture,
-  Scene,
-  StandardMaterial,
-} from '@babylonjs/core';
+import { Color3, Engine, Nullable, RawTexture, Scene } from '@babylonjs/core';
 import { MaterialPluginBase, UniformBuffer } from '@babylonjs/core';
 import { Material } from '@babylonjs/core/Materials/material';
 import { Matrix } from '@babylonjs/core/Maths/math.vector';
 import { GreasedLineMaterialParameters } from './graesedLineBuilder';
+import { GreasedLineMesh } from './greasedLineMesh';
 
 export class GreasedLinePluginMaterial extends MaterialPluginBase {
   private _colorsTexture?: RawTexture;
@@ -24,8 +18,7 @@ export class GreasedLinePluginMaterial extends MaterialPluginBase {
     parameters: GreasedLineMaterialParameters
   ) {
     super(material, GreasedLinePluginMaterial.name, 200, {
-      GLINE_HAS_COLOR: false,
-      GLINE_HAS_COLORS: false,
+      GREASED_LINE_HAS_COLOR: false,
     });
 
     this._engine = this._scene.getEngine();
@@ -60,6 +53,7 @@ export class GreasedLinePluginMaterial extends MaterialPluginBase {
         { name: 'lineWidth', size: 1, type: 'float' },
         { name: 'resolution', size: 2, type: 'vec2' },
         { name: 'singleColor', size: 3, type: 'vec3' },
+        { name: 'colorMode', size: 1, type: 'float' },
         { name: 'sizeAttenuation', size: 1, type: 'float' },
         { name: 'dashArray', size: 1, type: 'float' },
         { name: 'dashOffset', size: 1, type: 'float' },
@@ -86,6 +80,7 @@ export class GreasedLinePluginMaterial extends MaterialPluginBase {
       uniform float useColors;
       uniform sampler2D colors;
       uniform vec3 singleColor;
+      uniform float colorMode;
       `,
     };
   }
@@ -155,16 +150,18 @@ export class GreasedLinePluginMaterial extends MaterialPluginBase {
         GreasedLinePluginMaterial._bton(this._parameters.useDash)
       );
 
+      uniformBuffer.updateFloat('colorMode', this._parameters.colorMode);
+
       if (this._parameters.color) {
         uniformBuffer.updateColor3('singleColor', this._parameters.color);
       }
 
-      if (this._colorsTexture) {
-        uniformBuffer.updateFloat(
-          'useColors',
-          GreasedLinePluginMaterial._bton(this._parameters.useColors)
-        );
+      uniformBuffer.updateFloat(
+        'useColors',
+        GreasedLinePluginMaterial._bton(this._parameters.useColors)
+      );
 
+      if (this._colorsTexture) {
         uniformBuffer.updateFloat(
           'colorsWidth',
           this._colorsTexture.getSize().width * 2
@@ -181,8 +178,7 @@ export class GreasedLinePluginMaterial extends MaterialPluginBase {
     defines: Record<string, unknown> /*, scene: Scene, mesh: AbstractMesh*/
   ) {
     const parameters = this._parameters;
-    defines['GLINE_HAS_COLOR'] = !!parameters.color;
-    // defines['GLINE_HAS_COLORS'] = !!parameters.colors;
+    defines['GREASED_LINE_HAS_COLOR'] = !!parameters.color;
   }
 
   getClassName() {
@@ -209,7 +205,6 @@ export class GreasedLinePluginMaterial extends MaterialPluginBase {
     vec2 fix( vec4 i, float aspect ) {
       vec2 res = i.xy / i.w;
       res.x *= aspect;
-      vCounters = counters;
       return res;
   }
 `,
@@ -221,8 +216,9 @@ export class GreasedLinePluginMaterial extends MaterialPluginBase {
     positionUpdated += positionOffset;
         `,
         CUSTOM_VERTEX_MAIN_END: `
-    // vCounters = counters;
     vColorPointers = gl_VertexID;
+    vCounters = counters;
+
     float aspect = resolution.x / resolution.y;
 
     mat4 m = viewProjection * world;
@@ -243,10 +239,6 @@ export class GreasedLinePluginMaterial extends MaterialPluginBase {
       vec2 dir1 = normalize( currentP - prevP );
       vec2 dir2 = normalize( nextP - currentP );
       dir = normalize( dir1 + dir2 );
-
-      // vec2 perp = vec2( -dir1.y, dir1.x );
-      // vec2 miter = vec2( -dir.y, dir.x );
-      // w = clamp( w / dot( miter, perp ), 0., 4. * width * segmentWidth );
     }
     vec4 normal = vec4( -dir.y, dir.x, 0., 1. );
     normal.xy *= .5 * w;
@@ -286,13 +278,30 @@ export class GreasedLinePluginMaterial extends MaterialPluginBase {
             if(gl_FragColor.a == 0.) discard;
           }
 
-          #ifdef GLINE_HAS_COLOR
-            gl_FragColor.rgb = singleColor;
+          #ifdef GREASED_LINE_HAS_COLOR
+            if (colorMode == ${GreasedLineMesh.COLOR_MODE_SET}.) {
+              gl_FragColor.rgb = singleColor;
+            } else if (colorMode == ${GreasedLineMesh.COLOR_MODE_ADD}.) {
+              gl_FragColor.rgb += singleColor;
+            } else if (colorMode == ${GreasedLineMesh.COLOR_MODE_MULTIPLY}.) {
+              gl_FragColor.rgb *= singleColor;
+            }
           #else
             if (useColors == 1.) {
-              gl_FragColor *= texture2D(colors, vec2(float(vColorPointers)/(colorsWidth), 0.));
+              vec4 c = texture2D(colors, vec2(float(vColorPointers)/(colorsWidth), 0.));;
+
+              if (colorMode == ${GreasedLineMesh.COLOR_MODE_SET}.) {
+                gl_FragColor = c;
+              } else if (colorMode == ${GreasedLineMesh.COLOR_MODE_ADD}.) {
+                gl_FragColor += c;
+              } else if (colorMode == ${GreasedLineMesh.COLOR_MODE_MULTIPLY}.) {
+                gl_FragColor *= c;
+              }
+
+
             }
           #endif
+
       `,
       };
     }
@@ -300,16 +309,9 @@ export class GreasedLinePluginMaterial extends MaterialPluginBase {
     return null;
   }
 
-  /*
-              // float x = vColorPointers % colorsWidth;
-              // float y = vColorPointers / colorsWidth;
-              // c *= texture2D(colors, vec2(x, y));
-
-              gl_FragColor ${
-                (this._material as StandardMaterial).disableLighting ? '' : '*'
-              }= texture2D(colors, vec2(float(vColorPointers)/(colorsWidth), 0.));
-              //
-*/
+  // float x = vColorPointers % colorsWidth;
+  // float y = vColorPointers / colorsWidth;
+  // c *= texture2D(colors, vec2(x, y));
 
   private static _bton(bool?: boolean) {
     return bool ? 1 : 0;
@@ -327,6 +329,10 @@ export class GreasedLinePluginMaterial extends MaterialPluginBase {
       RawTexture.NEAREST_NEAREST
     );
     this._colorsTexture.name = 'greased-line-colors';
+  }
+
+  public dispose(): void {
+    super.dispose(true);
   }
 
   public setUseColors(value: boolean) {

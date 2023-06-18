@@ -101,7 +101,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     }
   }
 
-  debugger
+  // debugger
 
   if (instance) {
     (instance.material as StandardMaterial).disableLighting = true

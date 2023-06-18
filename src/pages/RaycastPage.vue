@@ -9,8 +9,8 @@ import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
 import { GreasedLineBuilder } from '../greased-line/graesedLineBuilder'
 import CodeSnippets from 'src/components/CodeSnippets.vue';
-import { WidthsDistribution } from 'src/greased-line/greasedLineMesh';
 import { segmentize } from 'src/greased-line/greasedLineTools';
+import { GreasedLineMesh } from 'src/greased-line/greasedLineMesh';
 
 
 const codeSnippets = [
@@ -59,7 +59,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     color: Color3.Red(),
     width: 10,
     widths,
-    widthsDistribution: WidthsDistribution.Repeat
+    widthsDistribution: GreasedLineBuilder.WIDTH_DISTRIBUTION_REPEAT
   }, scene)
 
   const origin = new Vector3(-3, 5, 1)

@@ -4,7 +4,7 @@
 </template>
 
 <script setup lang="ts">
-import { ArcRotateCamera, Color3, Scene, StandardMaterial, Vector3 } from '@babylonjs/core';
+import { ArcRotateCamera, Color3, Scene, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
 import { GreasedLineBuilder } from '../greased-line/graesedLineBuilder'
@@ -72,34 +72,42 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
         new Vector3(5, 0, 0),
         new Vector3(10, 0, 0),
       ],
+      colorMode: GreasedLineMesh.COLOR_MODE_SET
     },
     scene
   )
 
-  const mat = line1.material as StandardMaterial
-  mat.disableLighting = true
-  mat.emissiveColor = Color3.White()
+  // const mat = line1.material as StandardMaterial
+  // mat.disableLighting = true
+  // mat.emissiveColor = Color3.White()
 
+
+  /*
+
+
+  */
 
   //
 
-  const colors2 = [new Color3(0.5, 0.5, 0.5), new Color3(1, 1, 1)]
   const line2 = GreasedLineBuilder.CreateGreasedLine(
     'basic-line-2',
     {
-      width: 10,
+      width: 30,
+      color: Color3.Magenta(),
       points: [
         new Vector3(0, -4, 0),
         new Vector3(5, -4, 0),
         new Vector3(10, -4, 0),
       ],
+      // pbr: true
+
     },
     scene
   )
 
-  const mat2 = line2.material as StandardMaterial
-  mat2.disableLighting = true
-  mat2.emissiveColor = Color3.Blue()
+  // const mat2 = line2.material as PBRMaterial
+  // mat2.disableLighting = true
+  // mat2.emissiveColor = Color3.Blue()
 
   //
   const points3 = []
@@ -108,7 +116,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
     points3.push(new Vector3(x, Math.cos(x / 2) - 8, 0))
     colors3.push(Color3.Random())
   }
-  debugger
+  // debugger
   const line3 = GreasedLineBuilder.CreateGreasedLine(
     'basic-line-3',
     {
@@ -122,15 +130,15 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
   )
 
 
-  const mat3 = line3.material as StandardMaterial
+  // const mat3 = line3.material as StandardMaterial
   // mat3.disableLighting = true
-  mat3.emissiveColor = Color3.White()
+  // mat3.emissiveColor = Color3.White()
 
   //
 
 
   camera.zoomOnFactor = 1.3
-  camera.zoomOn([line1, line2, line3])
+  camera.zoomOn([line1, line3])
 
   // camera.position.x -= 5
   // camera.target.x -= 5

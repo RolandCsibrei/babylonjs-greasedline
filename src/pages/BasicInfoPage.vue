@@ -93,7 +93,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
 
   const widths = [1, 1, 4, 4, 8, 8]
   const offsets = [
-    0, 0, 0,
+    0, 1, 0,
     0, 0, 0,
     0, 0, 0,
     0, 0, 0,
@@ -125,7 +125,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
 
 
   if (line2.material) {
-    (line2.material as StandardMaterial).disableLighting = true
+    // (line2.material as StandardMaterial).disableLighting = true
   }
 
 

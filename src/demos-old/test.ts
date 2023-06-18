@@ -464,7 +464,7 @@ export async function testGeometryDrawCurves(
         }
 
         if (ss.length > 2) {
-          debugger;
+          // debugger;
         }
 
         console.log(ss);

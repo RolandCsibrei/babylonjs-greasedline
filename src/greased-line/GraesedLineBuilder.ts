@@ -50,6 +50,7 @@ export interface GreasedLineMaterialParameters {
   width?: number;
 
   color?: Color3;
+  colorMode: number;
   useColors?: boolean;
   colors?: Uint8Array;
   colorDistribution?: number;
@@ -80,6 +81,7 @@ export interface GreasedLineBuilderParameters {
   //
 
   color?: Color3;
+  colorMode?: number;
   opacity?: number;
   width?: number;
 
@@ -188,6 +190,7 @@ export function CreateGreasedLine(
       visibility: parameters.visibility,
       width: parameters.width,
       color: parameters.color,
+      colorMode: parameters.colorMode ?? GreasedLineMesh.COLOR_MODE_SET,
     };
 
     if (colors) {
@@ -201,7 +204,7 @@ export function CreateGreasedLine(
 
     if (parameters.unlit === true) {
       material.disableLighting = true;
-      debugger;
+      // debugger;
     }
 
     const plugin = new GreasedLinePluginMaterial(

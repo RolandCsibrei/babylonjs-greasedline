@@ -7,7 +7,7 @@
 import { ArcRotateCamera, Color3, Color4, GlowLayer, Scene, Vector3 } from '@babylonjs/core';
 import { init } from 'src/babylon';
 import { onMounted, ref } from 'vue';
-import { ColorDistribution, GreasedLineBuilder } from '../greased-line/graesedLineBuilder'
+import { GreasedLineBuilder } from '../greased-line/graesedLineBuilder'
 import CodeSnippets from 'src/components/CodeSnippets.vue';
 
 const codeSnippets = [
@@ -56,7 +56,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       useColors: true,
       points: points1.map(p => new Vector3(p.x, p.y + 2, p.z)),
       width: 40,
-      colorDistribution: ColorDistribution.End
+      colorDistribution: GreasedLineBuilder.COLOR_DISTRIBUTION_END
     },
     scene
   )
@@ -69,7 +69,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       useColors: true,
       points: points1.map(p => new Vector3(p.x, p.y + 4, p.z)),
       width: 40,
-      colorDistribution: ColorDistribution.Even
+      colorDistribution: GreasedLineBuilder.COLOR_DISTRIBUTION_END
     },
     scene
   )
@@ -81,7 +81,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       useColors: true,
       points: points1.map(p => new Vector3(p.x, p.y + 6, p.z)),
       width: 40,
-      colorDistribution: ColorDistribution.StartEnd
+      colorDistribution: GreasedLineBuilder.COLOR_DISTRIBUTION_END
     },
     scene
   )
@@ -93,7 +93,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       useColors: true,
       points: points1.map(p => new Vector3(p.x, p.y + 8, p.z)),
       width: 40,
-      colorDistribution: ColorDistribution.Repeat
+      colorDistribution: GreasedLineBuilder.COLOR_DISTRIBUTION_END
     },
     scene
   )
@@ -105,7 +105,7 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
       useColors: true,
       points: points1.map(p => new Vector3(p.x, p.y + 10, p.z)),
       width: 40,
-      colorDistribution: ColorDistribution.None
+      colorDistribution: GreasedLineBuilder.COLOR_DISTRIBUTION_END
     },
     scene
   )

@@ -68,7 +68,6 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
   material.emissiveTexture = texture
 
 
-
   //
 
   camera.zoomOn([circularAnalyzerLine])
@@ -79,8 +78,8 @@ const demo = (scene: Scene, camera: ArcRotateCamera) => {
 
   const glow = new GlowLayer('glow', scene, {
   })
-  glow.intensity = 0.8;
-  glow.blurKernelSize = 128
+  glow.intensity = 0.5;
+  glow.blurKernelSize = 100
 
 
   glow.referenceMeshToUseItsOwnMaterial(circularAnalyzerLine)
